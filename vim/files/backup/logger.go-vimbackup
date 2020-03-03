@@ -1,0 +1,152 @@
+package logger
+
+import (
+	"fmt"
+	"io"
+	"os"
+	"time"
+
+	"github.com/jsternberg/zap-logfmt"
+	isatty "github.com/mattn/go-isatty"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"gopkg.in/natefinch/lumberjack.v2"
+)
+
+const TimeFormat = "2006-01-02T15:04:05.000000Z07:00"
+
+func New(w io.Writer) *zap.Logger {
+	config := NewConfig()
+	l, _ := config.New(w)
+	return l
+}
+
+func (c *Config) NewQueryLogger() (*zap.Logger, error) {
+	return c.internalNewLogger(c.QueryFormat,
+		c.QueryFilename,
+		c.QueryMaxSize,
+		c.QueryMaxBackups,
+		c.QueryMaxAge)
+}
+
+func (c *Config) New(defaultOutput io.Writer) (*zap.Logger, error) {
+	return c.internalNewLogger(c.Format,
+		c.Filename,
+		c.MaxSize,
+		c.MaxBackups,
+		c.MaxAge)
+}
+
+func (c *Config) internalNewLogger(cformat string,
+	filename string,
+	maxSize int,
+	maxBackups int,
+	maxAge int) (*zap.Logger, error) {
+	var w zapcore.WriteSyncer = nil
+
+	format := cformat
+	if format == "console" {
+		format = "logfmt"
+		w = zapcore.AddSync(os.Stdout)
+	} else {
+		if format == "" || format == "auto" {
+			format = "logfmt"
+		}
+
+		// use lumberjack to rotate log
+		w = zapcore.AddSync(&lumberjack.Logger{
+			Filename:   filename,
+			MaxSize:    maxSize,
+			MaxBackups: maxBackups,
+			MaxAge:     maxAge,
+			LocalTime:  true,
+		})
+	}
+
+	encoder, err := newEncoder(format)
+	if err != nil {
+		return nil, err
+	}
+
+	return zap.New(zapcore.NewCore(
+		encoder,
+		w,
+		c.Level,
+	)), nil
+}
+
+func newEncoder(format string) (zapcore.Encoder, error) {
+	config := newEncoderConfig()
+	switch format {
+	case "json":
+		return zapcore.NewJSONEncoder(config), nil
+	case "console":
+		return zapcore.NewConsoleEncoder(config), nil
+	case "logfmt":
+		return zaplogfmt.NewEncoder(config), nil
+	default:
+		return nil, fmt.Errorf("unknown logging format: %s", format)
+	}
+}
+
+func newEncoderConfig() zapcore.EncoderConfig {
+	config := zap.NewProductionEncoderConfig()
+	config.EncodeTime = zapcore.ISO8601TimeEncoder
+	config.EncodeDuration = func(d time.Duration, encoder zapcore.PrimitiveArrayEncoder) {
+		val := float64(d) / float64(time.Millisecond)
+		encoder.AppendString(fmt.Sprintf("%.3fms", val))
+	}
+	config.LevelKey = "lvl"
+	return config
+}
+
+// IsTerminal checks if w is a file and whether it is an interactive terminal session.
+func IsTerminal(w io.Writer) bool {
+	if f, ok := w.(interface {
+		Fd() uintptr
+	}); ok {
+		return isatty.IsTerminal(f.Fd())
+	}
+	return false
+}
+
+const (
+	year = 365 * 24 * time.Hour
+	week = 7 * 24 * time.Hour
+	day  = 24 * time.Hour
+)
+
+func DurationLiteral(key string, val time.Duration) zapcore.Field {
+	if val == 0 {
+		return zap.String(key, "0s")
+	}
+
+	var (
+		value int
+		unit  string
+	)
+	switch {
+	case val%year == 0:
+		value = int(val / year)
+		unit = "y"
+	case val%week == 0:
+		value = int(val / week)
+		unit = "w"
+	case val%day == 0:
+		value = int(val / day)
+		unit = "d"
+	case val%time.Hour == 0:
+		value = int(val / time.Hour)
+		unit = "h"
+	case val%time.Minute == 0:
+		value = int(val / time.Minute)
+		unit = "m"
+	case val%time.Second == 0:
+		value = int(val / time.Second)
+		unit = "s"
+	default:
+		value = int(val / time.Millisecond)
+		unit = "ms"
+	}
+	return zap.String(key, fmt.Sprintf("%d%s", value, unit))
+}

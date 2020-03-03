@@ -1,0 +1,14 @@
+#ifndef QCM_HTTP_CONFIG_H_
+#define QCM_HTTP_CONFIG_H_
+namespace qcm {
+namespace http {
+ 
+struct Config {
+  bool http_only;
+  std::string ip;
+  uint16_t port;
+  unsigned int work_thead_size;
+};
+}//namespace http
+}//namespace qcm
+#endif//#ifndef QCM_HTTP_CONFIG_H_

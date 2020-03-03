@@ -1,0 +1,62 @@
+#include <sys/select.h>
+#include <sys/time.h>
+#include <iostream>
+#include <string>
+#include <string.h>
+#include <iomanip>
+
+void testSelect() {
+  struct timeval tv;
+  tv.tv_sec = 10;
+  tv.tv_usec = 10 * 1000;  //microseconds
+  while (1) {
+    select(0, NULL, NULL, NULL, &tv);
+    std::cout << "xxxxx " << std::endl;
+  }
+}
+
+void testMemset() {
+  int c = 0x44332211;
+  int s = 0;
+  memset((void*)&s, c, sizeof(s));
+  std::cout << std::setbase(16) << s << std::endl;
+
+  int a = 0x000011;
+  int b = 0x01010101;
+
+  std::cout << std::setbase(16) << a * b << std::endl;
+}
+
+void testMemcpy() {
+  char dest[5] = {0};
+  char test[5] = {0,'b'};
+  char src[10] = {'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a'};
+  std::cout << src << std::endl;
+  ::memcpy(dest, src, 6);
+  std::cout << dest << std::endl;
+  std::cout << test << std::endl;
+}
+
+void testArray() {
+  int int_array[] = {
+    10,
+  };
+
+  std::cout << int_array[1] << std::endl;
+}
+
+inline void showMsg() {
+  std::cout << "sssss" << std::endl;
+}
+
+int main(int argc, char* argv[]) {
+
+  showMsg();
+
+  //testMemcpy();
+  //testMemset();
+
+  testArray();
+  int a b;
+  return 0;
+}

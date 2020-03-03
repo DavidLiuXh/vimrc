@@ -1,0 +1,90 @@
+package cluster
+
+import (
+	"fmt"
+	"net"
+	"sync"
+	"time"
+
+	"github.com/influxdata/influxdb/cluster/meta11"
+	"gopkg.in/fatih/pool.v2"
+)
+
+type clientPool struct {
+	mu   sync.RWMutex
+	pool map[uint64]pool.Pool
+}
+
+func newClientPool() *clientPool {
+	return &clientPool{
+		pool: make(map[uint64]pool.Pool),
+	}
+}
+
+func (c *clientPool) setPool(nodeID uint64, p pool.Pool) {
+	c.mu.Lock()
+	c.pool[nodeID] = p
+	c.mu.Unlock()
+}
+
+func (c *clientPool) getPool(nodeID uint64) (pool.Pool, bool) {
+	c.mu.RLock()
+	p, ok := c.pool[nodeID]
+	c.mu.RUnlock()
+	return p, ok
+}
+
+func (c *clientPool) size() int {
+	var size int
+	for _, p := range c.pool {
+		size += p.Len()
+	}
+	return size
+}
+
+func (c *clientPool) conn(nodeID uint64) (net.Conn, error) {
+	c.mu.RLock()
+	conn, err := c.pool[nodeID].Get()
+	c.mu.RUnlock()
+	return conn, err
+}
+
+func (c *clientPool) close() {
+	c.mu.Lock()
+	for _, p := range c.pool {
+		p.Close()
+	}
+	c.mu.Unlock()
+}
+
+type tmetaClient interface {
+	DataNode(id uint64) (ni *meta11.NodeInfo, err error)
+}
+
+func (c *clientPool) createAndGetPool(nodeID uint64,
+	metaClient tmetaClient,
+	maxConnections int,
+	timeout time.Duration) error {
+
+	if metaClient == nil {
+		return fmt.Errorf("in shardWriter, metaclient %d does not exist", nodeID)
+	}
+
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	_, ok := c.pool[nodeID]
+	if !ok {
+		factory := &connFactory{nodeID: nodeID, clientPool: c, timeout: timeout}
+		factory.metaClient = metaClient
+
+		//maxConnections for max conn
+		p, err := NewBoundedPool(1, maxConnections, timeout, factory.dial)
+		if err != nil {
+			return err
+		}
+		c.pool[nodeID] = p
+	}
+
+	return nil
+}

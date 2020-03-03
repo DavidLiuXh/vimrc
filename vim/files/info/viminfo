@@ -1,0 +1,1616 @@
+# è¿™ä¸ª viminfo æ–‡ä»¶æ˜¯ç”± Vim 8.0 æ‰€äº§ç”Ÿã€‚
+# å¦‚æœæƒ³è¦è‡ªè¡Œä¿®æ”¹è¯·ç‰¹åˆ«å°å¿ƒï¼
+
+# Viminfo version
+|1,4
+
+# æ–‡ä»¶è¢«å†™çš„æ—¶å€™ â€˜encodingâ€™ çš„å€¼
+*encoding=utf-8
+
+
+# hlsearch on (H) or off (h):
+~H
+# ä¸Šä¸ª Search å›¾æ¡ˆï¼š
+~Msle0~/\<initialHighWatermarkValue\>
+
+# ä¸Šä¸ª æ›¿æ¢ Search å›¾æ¡ˆï¼š
+~MSle0&ycm_global_ycm_extra_conf='/home/lw/.vim/plugged/YouCompleteMe/third_party/ycmd/.ycm_extra_conf.py'
+
+# æœ€åæ›¿æ¢çš„å­—ç¬¦ä¸²
+$
+
+# å‘½ä»¤è¡Œ å†å²è®°å½• (ä»æ–°åˆ°æ—§)ï¼š
+:q
+|2,0,1583212622,,"q"
+:cs find g start_kernel
+|2,0,1583212602,,"cs find g start_kernel"
+:cs find start_kernel
+|2,0,1583212596,,"cs find start_kernel"
+:wq
+|2,0,1583212479,,"wq"
+:w
+|2,0,1583212457,,"w"
+:vs
+|2,0,1575429361,,"vs"
+:Vs
+|2,0,1575429360,,"Vs"
+:tabnew
+|2,0,1577688616,,"tabnew"
+:b3
+|2,0,1577092828,,"b3"
+:ls
+|2,0,1577092823,,"ls"
+:b37
+|2,0,1577088117,,"b37"
+:'<,'>q
+|2,0,1577087672,,"'<,'>q"
+:sp
+|2,0,1577085052,,"sp"
+:vsp
+|2,0,1577085049,,"vsp"
+:947
+|2,0,1577082253,,"947"
+:b 36
+|2,0,1577082249,,"b 36"
+:'<,'>ls
+|2,0,1577082245,,"'<,'>ls"
+:vimgrep /handleDecodeError/g **/*.go
+|2,0,1577082074,,"vimgrep /handleDecodeError/g **/*.go"
+:737
+|2,0,1576823080,,"737"
+:cclose
+|2,0,1576823061,,"cclose"
+:cw
+|2,0,1576820569,,"cw"
+:vimgrep /xxxx/g **/*.go
+|2,0,1576820566,,"vimgrep /xxxx/g **/*.go"
+:vimgrep /zkdebug2/g **/*.go
+|2,0,1576820496,,"vimgrep /zkdebug2/g **/*.go"
+:vimgrep /zkdebug/g **/*.go
+|2,0,1576820462,,"vimgrep /zkdebug/g **/*.go"
+:vimgrep zkdebug
+|2,0,1576820453,,"vimgrep zkdebug"
+:b19
+|2,0,1576820372,,"b19"
+:664
+|2,0,1576820331,,"664"
+:644
+|2,0,1576820326,,"644"
+:vimgrep /newFileSetTagValueIterator/g **/*.go
+|2,0,1576816018,,"vimgrep /newFileSetTagValueIterator/g **/*.go"
+:b20
+|2,0,1576815933,,"b20"
+:b15
+|2,0,1576808563,,"b15"
+:vimgrep /SSSSSS/g **/*.go
+|2,0,1576807318,,"vimgrep /SSSSSS/g **/*.go"
+:w\
+|2,0,1576807083,,"w\\"
+:1800
+|2,0,1576758379,,"1800"
+:e
+|2,0,1578276790,,"e"
+:q!
+|2,0,1578275439,,"q!"
+:we
+|2,0,1576481221,,"we"
+:vimgrep /break/g **/*.scala
+|2,0,1577342080,,"vimgrep /break/g **/*.scala"
+:buffer 37
+|2,0,1576751865,,"buffer 37"
+:files
+|2,0,1576751812,,"files"
+:buffers
+|2,0,1576751743,,"buffers"
+:qrst
+|2,0,1576751724,,"qrst"
+:tab list
+|2,0,1576751655,,"tab list"
+:tablist
+|2,0,1576751653,,"tablist"
+:lb
+|2,0,1576751632,,"lb"
+:bl
+|2,0,1576751616,,"bl"
+:Cw
+|2,0,1576748363,,"Cw"
+:vimgrep /IteratorScanner/g **/*.go
+|2,0,1576748359,,"vimgrep /IteratorScanner/g **/*.go"
+:173
+|2,0,1576665880,,"173"
+:s
+|2,0,1576665687,,"s"
+
+# æŸ¥æ‰¾å­—ç¬¦ä¸² å†å²è®°å½• (ä»æ–°åˆ°æ—§)ï¼š
+?/lastSeries
+|2,1,1577092864,47,"lastSeries"
+?/w.size
+|2,1,1577090882,47,"w.size"
+? \<currentSegmentWriter\>
+|2,1,1577090837,,"\\<currentSegmentWriter\\>"
+?/Open(
+|2,1,1577090674,47,"Open("
+? \<errStringBatchDecodeShortBuffer\>
+|2,1,1577090227,,"\\<errStringBatchDecodeShortBuffer\\>"
+?/compactGroup
+|2,1,1577088120,47,"compactGroup"
+?/Prepare(
+|2,1,1577087687,47,"Prepare("
+? \<keyBuf\>
+|2,1,1577085953,,"\\<keyBuf\\>"
+?/Digest
+|2,1,1577085897,47,"Digest"
+?/Degist
+|2,1,1577085893,47,"Degist"
+?/TagKeySeriesIDIterator
+|2,1,1577085467,47,"TagKeySeriesIDIterator"
+? \<NewTSMBatchKeyIterator\>
+|2,1,1577082264,,"\\<NewTSMBatchKeyIterator\\>"
+?/Read()
+|2,1,1577082200,47,"Read()"
+?/handleDecodeError
+|2,1,1577082067,47,"handleDecodeError"
+?/handleEncodeError
+|2,1,1577082008,47,"handleEncodeError"
+?/tsmBatchKeyIterator
+|2,1,1577081834,47,"tsmBatchKeyIterator"
+?/NewTSMBatchKeyIterator
+|2,1,1577081816,47,"NewTSMBatchKeyIterator"
+?/xxxx
+|2,1,1576825422,47,"xxxx"
+? \<executeShowTagValues\>
+|2,1,1576824937,,"\\<executeShowTagValues\\>"
+?/Show
+|2,1,1576824930,47,"Show"
+? \<StatementExecutor\>
+|2,1,1576824866,,"\\<StatementExecutor\\>"
+? \<serveQuery\>
+|2,1,1576824839,,"\\<serveQuery\\>"
+? \<processExecuteStatement1Request\>
+|2,1,1576824737,,"\\<processExecuteStatement1Request\\>"
+? \<zkdebug2\>
+|2,1,1576817700,,"\\<zkdebug2\\>"
+?/xxxxx
+|2,1,1576817605,47,"xxxxx"
+? \<newLogTagValueIterator\>
+|2,1,1576817104,,"\\<newLogTagValueIterator\\>"
+?/TagValueIt
+|2,1,1576816799,47,"TagValueIt"
+?/fs
+|2,1,1576816735,47,"fs"
+?/fslll
+|2,1,1576816727,47,"fslll"
+? \<fileSetTagValueIterator\>
+|2,1,1576815966,,"\\<fileSetTagValueIterator\\>"
+?/TagValueIterator
+|2,1,1576815943,47,"TagValueIterator"
+?/fileSetTagValueIterator
+|2,1,1576815676,47,"fileSetTagValueIterator"
+?/TagKeyElem(
+|2,1,1576815521,47,"TagKeyElem("
+? \<MeasurementTagKeyValuesByExpr\>
+|2,1,1576815474,,"\\<MeasurementTagKeyValuesByExpr\\>"
+?/TagValues(
+|2,1,1576815455,47,"TagValues("
+?/F111
+|2,1,1576815421,47,"F111"
+?/SSSS
+|2,1,1576815375,47,"SSSS"
+?/uuuuu
+|2,1,1576815340,47,"uuuuu"
+?/TagKeyElem
+|2,1,1576812945,47,"TagKeyElem"
+?/tblks
+|2,1,1576810599,47,"tblks"
+?/gg
+|2,1,1576810595,47,"gg"
+?/files
+|2,1,1576810455,47,"files"
+? \<tagValueIterator\>
+|2,1,1576809487,,"\\<tagValueIterator\\>"
+?/IndexSet
+|2,1,1576809448,47,"IndexSet"
+?/SSSSS
+|2,1,1576808550,47,"SSSSS"
+?/SSSSSS
+|2,1,1576807333,47,"SSSSSS"
+? \<tagValueMergeIterator\>
+|2,1,1576806675,,"\\<tagValueMergeIterator\\>"
+? \<TagValueIterator\>
+|2,1,1576805670,,"\\<TagValueIterator\\>"
+? \<sitr\>
+|2,1,1576805033,,"\\<sitr\\>"
+?/tagValueIterator
+|2,1,1576804965,47,"tagValueIterator"
+
+# è¡¨è¾¾å¼ å†å²è®°å½• (ä»æ–°åˆ°æ—§)ï¼š
+
+# è¾“å…¥è¡Œ å†å²è®°å½• (ä»æ–°åˆ°æ—§)ï¼š
+@y
+|2,3,0,,"y"
+@N
+|2,3,0,,"N"
+@tss
+|2,3,0,,"tss"
+@test
+|2,3,0,,"test"
+@testccc
+|2,3,0,,"testccc"
+
+# Debug Line å†å²è®°å½• (ä»æ–°åˆ°æ—§)ï¼š
+
+# å¯„å­˜å™¨:
+"0	LINE	0
+	1. å°†resultset.goå¤åˆ¶åˆ°$GAPATH/src/github.com/influxdata/platform/storage/readsä¸‹;
+|3,0,0,1,1,0,1582852904,"1. å°†resultset.goå¤åˆ¶åˆ°$GAPATH/src/github.com/influxdata/platform/storage/readsä¸‹;"
+""1	LINE	0
+	:let mapleader=","                                                                                                                                                           
+|3,1,1,1,1,0,1583212417,":let mapleader=\",\"                                                                                                                                                           "
+"2	LINE	0
+			e.Logger.Info(fmt.Sprintf("xxxxx | AAAAAAA | %v : %v", nodeID, shardIDs))
+|3,0,2,1,1,0,1578296110,"		e.Logger.Info(fmt.Sprintf(\"xxxxx | AAAAAAA | %v : %v\", nodeID, shardIDs))"
+"3	LINE	0
+			e.Logger.Info(fmt.Sprintf("xxxxx | AAAAAAA | shard id:%v | node id:%v\n", shardIDs, nodeID)
+|3,0,3,1,1,0,1578277004,"		e.Logger.Info(fmt.Sprintf(\"xxxxx | AAAAAAA | shard id:%v | node id:%v\\n\", shardIDs, nodeID)"
+"4	LINE	0
+			compressedSz = snappy.MaxEncodedLen(srcSz) + 1 /* header */
+|3,0,4,1,1,0,1577090198,"		compressedSz = snappy.MaxEncodedLen(srcSz) + 1 /* header */"
+"5	LINE	0
+			if c.Ascending {
+				timeRange.Min = timeRange.Min.Add(time.Duration(-c.ExtraIntervals) * c.Interval.Duration)
+			} else {
+				timeRange.Max = timeRange.Max.Add(time.Duration(c.ExtraIntervals) * c.Interval.Duration)
+			}
+|3,0,5,1,5,0,1577087727,"		if c.Ascending {","			timeRange.Min = timeRange.Min.Add(time.Duration(-c.ExtraIntervals) * c.Interval.Duration)","		} else {","			timeRange.Max = timeRange.Max.Add(time.Duration(c.ExtraIntervals) * c.Interval.Duration)","		}"
+"6	LINE	0
+		if itr == nil {
+		}
+|3,0,6,1,2,0,1577085568,"	if itr == nil {","	}"
+"7	LINE	0
+	
+|3,0,7,1,1,0,1577085535,""
+"8	LINE	0
+			fs.Release()
+			return nil
+|3,0,8,1,2,0,1577085534,"		fs.Release()","		return nil"
+"9	CHAR	0
+	 // TODO(edd)
+|3,0,9,0,1,0,1577085495," // TODO(edd)"
+"q	CHAR	0
+	1025
+<ggjnjlllllllllllllllllllllll€ı,€ı-€ı-€ı-€ı-€ı.€ıc€ıb€ı,€ı-€ı-€ı-€ı-€ı-€ı-€ı.€ı,€ı./ParseStatemtn€kb€kbentnjn/€kunk€ıL€ıL€ıL€ıL€ıK€ı,€ı.j:q€ı,€ı.]:q€ıc€ıb€ıc€ıb€ı,€ı-€ı.€ı,€ı.:v€kbspkkkll:e inf	€kb€kb€kb€kb€kb€kb€kb€kb€kb€kb€kb€kbpwd:pwdlkjljljljljljljlhjjkljl;jllljljlkjl€k7/Scan()njjkjkjkjkjkjkjkjkjkjkjkkkkkjkjkjjjjkhhhhhhjlllllllllljjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjkkkkkkkjjjjjjjjjjjjjhkkkjjjjkjkjkjkjkjkjkjkjkjkjkjkkkkk]jjjjjj€ıc€ıbkGkkkkkkkkkkkkkkkkkkkkkk€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıL€ı,€ı.€ıL€ıL€ı,€ı-€ı-€ı-€ı-€ı-€ı-€ı-€ı-€ı-€ı-€ı.€ıc€ıb€ı,€ı.€ıd€ü €ı,€ü €ı.€ıL€ıL€ıL€ıL€ı,€ı.€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıc€ıb€ğX/€#3€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıc€ıb€ıL€ıL€ıL€ıK€ıc€ıb€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıc€ıb€ıc€ıb1
+|3,0,26,0,1,0,1558334610,>1024
+|<"ggjnjlllllllllllllllllllllll€ı,€ı-€ı-€ı-€ı-€ı.€ıc€ıb€ı,€ı-€ı-€ı-€ı-€ı-€ı-€ı.€ı,€ı./ParseStatemtn€kb€kbentnjn/€kunk€ıL€ıL€ıL€ıL€ıK€ı,€ı.j:q€ı,€ı.]:q€ıc€ıb€ıc€ıb€ı,€ı-€ı.€ı,€ı.:v€kbspkkkll:e inf	€kb€kb€kb€kb€kb€kb€kb€kb€kb€kb€kb€kbpwd:pwdlkjljljljljljljlhjjkljl;jllljljlkjl€k7/Scan()njjkjkjkjkjkjkjkjkjkjkjkkkkkjkjkjjjjkhhhhhhjlllllllllljjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjkkkkkkkjjjjjjjjjjjjjhkkkjjjjkjkjkjkjkjkjkjkjkjkjkjk
+|<kkkk]jjjjjj€ıc€ıbkGkkkkkkkkkkkkkkkkkkkkkk€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıL€ı,€ı.€ıL€ıL€ı,€ı-€ı-€ı-€ı-€ı-€ı-€ı-€ı-€ı-€ı-€ı.€ıc€ıb€ı,€ı.€ıd€ü €ı,€ü €ı.€ıL€ıL€ıL€ıL€ı,€ı.€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıc€ıb€ğX/€#3€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıc€ıb€ıL€ıL€ıL€ıK€ıc€ıb€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıL€ıK€ıK€ıK€
+|<ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıK€ıc€ıb€ıc€ıb1"
+"v	CHAR	0
+	e
+|3,0,31,0,1,0,1573785118,"e"
+"-	CHAR	0
+	"
+|3,0,36,0,1,0,1583212413,"\""
+
+# æ–‡ä»¶æ ‡è®°:
+'0  7  18  ~/opensources/linux-5.4.2/init/main.c
+|4,48,7,18,1583212622,"~/opensources/linux-5.4.2/init/main.c"
+'1  220  0  ~/.vim/vimrc
+|4,49,220,0,1583212572,"~/.vim/vimrc"
+'2  220  0  ~/.vim/vimrc
+|4,50,220,0,1583212479,"~/.vim/vimrc"
+'3  5  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh
+|4,51,5,0,1582874584,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh"
+'4  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client
+|4,52,1,0,1582868828,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client"
+'5  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,53,2,0,1582868802,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+'6  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/360_platform/README
+|4,54,2,0,1582852915,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/360_platform/README"
+'7  1  86  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/360_platform/README
+|4,55,1,86,1582852333,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/360_platform/README"
+'8  1  86  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/360_platform/README
+|4,56,1,86,1582852333,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/360_platform/README"
+'9  11  0  ~/.vim/vimrc
+|4,57,11,0,1582525579,"~/.vim/vimrc"
+
+# è·³è½¬åˆ—è¡¨ (ä»æ–°åˆ°æ—§):
+-'  7  18  ~/opensources/linux-5.4.2/init/main.c
+|4,39,7,18,1583212622,"~/opensources/linux-5.4.2/init/main.c"
+-'  579  0  ~/opensources/linux-5.4.2/init/main.c
+|4,39,579,0,1583212612,"~/opensources/linux-5.4.2/init/main.c"
+-'  576  2  ~/opensources/linux-5.4.2/init/main.c
+|4,39,576,2,1583212608,"~/opensources/linux-5.4.2/init/main.c"
+-'  1  0  ~/opensources/linux-5.4.2/init/main.c
+|4,39,1,0,1583212603,"~/opensources/linux-5.4.2/init/main.c"
+-'  220  0  ~/.vim/vimrc
+|4,39,220,0,1583212572,"~/.vim/vimrc"
+-'  220  0  ~/.vim/vimrc
+|4,39,220,0,1583212572,"~/.vim/vimrc"
+-'  1  0  ~/.vim/vimrc
+|4,39,1,0,1583212499,"~/.vim/vimrc"
+-'  1  0  ~/.vim/vimrc
+|4,39,1,0,1583212499,"~/.vim/vimrc"
+-'  220  0  ~/.vim/vimrc
+|4,39,220,0,1583212479,"~/.vim/vimrc"
+-'  220  0  ~/.vim/vimrc
+|4,39,220,0,1583212479,"~/.vim/vimrc"
+-'  22  6  ~/.vim/vimrc
+|4,39,22,6,1583212459,"~/.vim/vimrc"
+-'  22  6  ~/.vim/vimrc
+|4,39,22,6,1583212459,"~/.vim/vimrc"
+-'  22  6  ~/.vim/vimrc
+|4,39,22,6,1583212459,"~/.vim/vimrc"
+-'  22  6  ~/.vim/vimrc
+|4,39,22,6,1583212459,"~/.vim/vimrc"
+-'  23  23  ~/.vim/vimrc
+|4,39,23,23,1583212425,"~/.vim/vimrc"
+-'  23  23  ~/.vim/vimrc
+|4,39,23,23,1583212425,"~/.vim/vimrc"
+-'  23  23  ~/.vim/vimrc
+|4,39,23,23,1583212425,"~/.vim/vimrc"
+-'  23  23  ~/.vim/vimrc
+|4,39,23,23,1583212425,"~/.vim/vimrc"
+-'  219  0  ~/.vim/vimrc
+|4,39,219,0,1583212418,"~/.vim/vimrc"
+-'  219  0  ~/.vim/vimrc
+|4,39,219,0,1583212418,"~/.vim/vimrc"
+-'  219  0  ~/.vim/vimrc
+|4,39,219,0,1583212418,"~/.vim/vimrc"
+-'  219  0  ~/.vim/vimrc
+|4,39,219,0,1583212418,"~/.vim/vimrc"
+-'  1  0  ~/.vim/vimrc
+|4,39,1,0,1583212139,"~/.vim/vimrc"
+-'  1  0  ~/.vim/vimrc
+|4,39,1,0,1583212139,"~/.vim/vimrc"
+-'  5  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh
+|4,39,5,0,1582874584,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh"
+-'  5  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh
+|4,39,5,0,1582874584,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh"
+-'  5  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh
+|4,39,5,0,1582874584,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh"
+-'  5  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh
+|4,39,5,0,1582874584,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh"
+-'  5  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh
+|4,39,5,0,1582874584,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh"
+-'  5  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh
+|4,39,5,0,1582874584,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh"
+-'  5  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh
+|4,39,5,0,1582874584,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh"
+-'  5  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh
+|4,39,5,0,1582874584,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh
+|4,39,1,0,1582868859,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh
+|4,39,1,0,1582868859,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh
+|4,39,1,0,1582868859,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh
+|4,39,1,0,1582868859,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh
+|4,39,1,0,1582868859,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh
+|4,39,1,0,1582868859,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh
+|4,39,1,0,1582868859,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh
+|4,39,1,0,1582868859,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client
+|4,39,1,0,1582868828,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client
+|4,39,1,0,1582868828,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client
+|4,39,1,0,1582868828,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client
+|4,39,1,0,1582868828,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client
+|4,39,1,0,1582868828,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client
+|4,39,1,0,1582868828,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client
+|4,39,1,0,1582868828,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client
+|4,39,1,0,1582868828,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client
+|4,39,1,0,1582868828,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client
+|4,39,1,0,1582868828,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client
+|4,39,1,0,1582868828,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client
+|4,39,1,0,1582868828,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client
+|4,39,1,0,1582868828,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client
+|4,39,1,0,1582868828,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client
+|4,39,1,0,1582868828,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client
+|4,39,1,0,1582868828,"~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client"
+-'  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,2,0,1582868802,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,2,0,1582868802,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,2,0,1582868802,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,2,0,1582868802,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,2,0,1582868802,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,2,0,1582868802,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,2,0,1582868802,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,2,0,1582868802,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,2,0,1582868802,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,2,0,1582868802,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,2,0,1582868802,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,2,0,1582868802,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,2,0,1582868802,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,2,0,1582868802,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,2,0,1582868802,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,2,0,1582868802,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,2,0,1582868802,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,2,0,1582868802,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,2,0,1582868802,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,2,0,1582868802,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,2,0,1582868802,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,2,0,1582868802,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,2,0,1582868802,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,2,0,1582868802,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,2,0,1582868802,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,2,0,1582868802,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,2,0,1582868802,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,2,0,1582868802,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,2,0,1582868802,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,2,0,1582868802,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,2,0,1582868802,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  2  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,2,0,1582868802,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,1,0,1582868800,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,1,0,1582868800,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,1,0,1582868800,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,1,0,1582868800,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,1,0,1582868800,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,1,0,1582868800,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,1,0,1582868800,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,1,0,1582868800,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,1,0,1582868800,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,1,0,1582868800,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,1,0,1582868800,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+-'  1  0  ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+|4,39,1,0,1582868800,"~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh"
+
+# æ–‡ä»¶å†…çš„æ ‡è®°å†å²è®°å½• (ä»æ–°åˆ°æ—§):
+
+> ~/opensources/linux-5.4.2/init/main.c
+	*	1583212620	0
+	"	7	18
+	.	576	0
+	+	576	0
+
+> ~/opensources/linux-5.4.2/NERD_tree_1
+	*	1583212587	0
+	"	7	0
+	.	1	0
+	+	1	0
+
+> ~/.vim/vimrc
+	*	1583212503	0
+	"	220	0
+	^	22	7
+	.	22	6
+	+	220	0
+	+	219	0
+	+	220	23
+	+	218	0
+	+	217	0
+	+	219	0
+	+	23	0
+	+	18	0
+	+	20	0
+	+	21	0
+	+	19	17
+	+	22	6
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test.sh
+	*	1582874583	0
+	"	5	0
+	^	8	11
+	.	8	10
+	+	9	0
+	+	9	154
+	+	11	0
+	+	9	161
+	+	9	3
+	+	10	3
+	+	10	206
+	+	10	535
+	+	11	0
+	+	10	535
+	+	11	0
+	+	10	206
+	+	11	0
+	+	10	177
+	+	10	506
+	+	10	307
+	+	10	0
+	+	10	321
+	+	10	0
+	+	11	0
+	+	10	124
+	+	10	0
+	+	4	0
+	+	8	3
+	+	3	0
+	+	8	43
+	+	3	0
+	+	4	0
+	+	8	0
+	+	10	0
+	+	10	124
+	+	4	16
+	+	10	124
+	+	12	0
+	+	5	0
+	+	11	0
+	+	12	0
+	+	12	121
+	+	12	0
+	+	3	0
+	+	11	0
+	+	9	0
+	+	5	0
+	+	9	0
+	+	8	0
+	+	13	0
+	+	3	0
+	+	4	0
+	+	11	0
+	+	14	0
+	+	13	0
+	+	8	0
+	+	4	0
+	+	3	0
+	+	8	10
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test_client
+	*	1582868827	0
+	"	1	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/test.sh
+	*	1582868800	0
+	"	2	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/360_platform/README
+	*	1582852915	0
+	"	2	0
+	^	2	1
+	.	2	0
+	+	1	86
+	+	2	0
+
+> ~/works/qcm/config-server/server/store/etcd_client.cc
+	*	1582508570	0
+	"	304	0
+
+> /proc/cpuinfo
+	*	1579418745	0
+	"	1	0
+
+> ~/cpuinfo.sh
+	*	1579418684	0
+	"	15	35
+	^	15	36
+	.	15	35
+	+	15	35
+
+> ~/.bash_profile
+	*	1579163243	0
+	"	1	0
+	^	8	1
+	.	5	0
+	+	5	0
+	+	8	0
+	+	5	0
+	+	8	0
+	+	5	0
+	+	8	0
+	+	5	0
+	+	8	0
+	+	5	0
+	+	8	0
+	+	5	0
+	+	8	0
+	+	5	0
+	+	8	0
+	+	5	0
+	+	8	0
+	+	5	0
+
+> /boot/grub/grub.cfg
+	*	1579145856	0
+	"	125	0
+
+> ~/works/qbus_2-0/operations/kafka-manager/build.sbt
+	*	1579052490	0
+	"	86	0
+
+> ~/works/qbus_2-0/operations/kafka-manager/deploy.sh
+	*	1579052476	0
+	"	19	0
+
+> ~/works/qbus_2-0/operations/kafka-manager/build.sh
+	*	1579052448	0
+	"	33	0
+
+> /proc/softirqs
+	*	1578911361	0
+	"	1	20
+
+> /proc/interrupts
+	*	1578902125	0
+	"	1	11
+	^	2	124
+
+> /proc/stat
+	*	1578895931	0
+	"	16	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/wget-log
+	*	1578379926	0
+	"	5	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/cluster/shard_mapper.go
+	*	1578378465	0
+	"	119	51
+	.	123	0
+	+	123	0
+
+> ~/works/qbus_2-0/operations/kafka-manager/README.md
+	*	1578293106	0
+	"	1	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/qproxy28021/logs/influx-proxy.log
+	*	1578276792	0
+	"	936	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/NERD_tree_1
+	*	1578276667	0
+	"	22	9
+	.	1	0
+	+	1	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/tsdb/engine/tsm1/wal.go
+	*	1578276656	0
+	"	737	0
+	^	227	49
+	.	227	3
+	+	227	3
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/qproxy28021/logs/influx-proxy.log.panic
+	*	1578276388	0
+	"	23	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/proxy1.conf
+	*	1578276044	0
+	"	101	0
+	^	370	16
+	.	370	15
+	+	28	0
+	+	370	15
+
+> /usr/bin/myssh
+	*	1578275450	0
+	"	2	27
+	^	2	28
+	.	2	27
+	+	2	27
+
+> ~/works/qcm/config-server/client/go/service_find.go
+	*	1577789813	0
+	"	1	0
+
+> ~/works/qcm/config-server/client/go/example_callback.go
+	*	1577789761	0
+	"	60	0
+
+> /usr/share/vim/vim80/File/LeaderF
+	*	1577688617	0
+	"	1	0
+	.	1	0
+	+	1	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/tsdb/series_segment.go
+	*	1577688612	0
+	"	76	16
+	^	75	4
+	.	75	3
+	+	73	3
+	+	74	16
+	+	75	3
+
+> ~/test/test.cc
+	*	1577675253	0
+	"	60	9
+	^	60	10
+	.	60	9
+	+	64	0
+	+	18	19
+	+	19	0
+	+	47	0
+	+	21	34
+	+	22	29
+	+	5	17
+	+	6	8
+	+	16	0
+	+	26	0
+	+	27	39
+	+	25	13
+	+	30	18
+	+	30	19
+	+	30	17
+	+	30	19
+	+	31	18
+	+	38	0
+	+	31	20
+	+	33	18
+	+	38	0
+	+	33	21
+	+	35	24
+	+	61	0
+	+	56	14
+	+	36	29
+	+	32	6
+	+	33	19
+	+	32	12
+	+	32	10
+	+	37	19
+	+	36	0
+	+	34	0
+	+	33	0
+	+	34	0
+	+	33	0
+	+	34	0
+	+	33	0
+	+	32	21
+	+	57	14
+	+	40	18
+	+	41	26
+	+	42	12
+	+	43	3
+	+	45	40
+	+	59	13
+	+	56	3
+	+	57	3
+	+	45	25
+	+	41	2
+	+	60	9
+	+	42	4
+	+	60	9
+
+> ~/works/qbus_2-0/operations/kafka-manager/sbt-ctags-dep-srcs/scala/util/control/Breaks.scala
+	*	1577358217	0
+	"	82	6
+
+> ~/works/qcm/config-server/client/java/examples/QcmExample1.java
+	*	1577356055	0
+	"	31	0
+
+> ~/works/qcm/config-server/client/java/examples/run.sh
+	*	1577356017	0
+	"	1	0
+
+> ~/works/qcm/config-server/client/qcm.i
+	*	1577355993	0
+	"	1	0
+
+> ~/works/qcm/config-server/client/java/README
+	*	1577355970	0
+	"	1	0
+
+> ~/works/qcm/config-server/client/java/Makefile
+	*	1577355957	0
+	"	1	0
+
+> ~/works/qcm/config-server/client/java/build.sh
+	*	1577355953	0
+	"	1	0
+
+> ~/works/qcm/config-server/client/java/examples/QcmExample4.java
+	*	1577355928	0
+	"	1	0
+
+> ~/works/qcm/config-server/client/java/examples/QcmExample3.java
+	*	1577355907	0
+	"	35	0
+
+> ~/works/qcm/config-server/client/java/examples/QcmExample2.java
+	*	1577355900	0
+	"	27	0
+
+> ~/works/qbus_2-0/operations/kafka-manager/sbt-ctags-dep-srcs/scala/tools/nsc/backend/opt/Inliners.scala
+	*	1577342138	0
+	"	368	16
+
+> ~/works/qbus_2-0/operations/kafka-manager/sbt-ctags-dep-srcs/akka/actor/ActorCell.scala
+	*	1577342101	0
+	"	344	14
+
+> ~/works/qbus_2-0/operations/kafka-manager/NERD_tree_1
+	*	1577342067	0
+	"	4	0
+	.	1	0
+	+	1	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/services/httpd/handler.go
+	*	1577093573	0
+	"	734	36
+	^	734	37
+	.	734	5
+	+	656	50
+	+	656	0
+	+	464	0
+	+	656	56
+	+	656	0
+	+	656	50
+	+	656	0
+	+	734	5
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/tsdb/engine/tsm1/file_store.go
+	*	1577090816	0
+	"	535	14
+	^	546	0
+	.	546	0
+	+	546	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/tsdb/engine/tsm1/batch_string.go
+	*	1577090664	0
+	"	22	17
+	^	5	8
+	.	5	7
+	+	33	0
+	+	17	0
+	+	16	1
+	+	7	6
+	+	5	7
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/tsdb/engine/tsm1/engine.go
+	*	1577090137	0
+	"	2234	24
+	^	2234	25
+	.	2234	24
+	+	1274	67
+	+	1295	75
+	+	1307	52
+	+	1314	59
+	+	1307	60
+	+	1295	60
+	+	1314	0
+	+	1295	81
+	+	1307	81
+	+	1314	80
+	+	1314	6
+	+	1315	95
+	+	1308	0
+	+	1314	0
+	+	1307	7
+	+	1296	0
+	+	1295	0
+	+	1295	7
+	+	1274	0
+	+	2003	0
+	+	2022	43
+	+	2003	0
+	+	2022	43
+	+	2003	0
+	+	1512	1
+	+	1531	0
+	+	1511	29
+	+	1528	112
+	+	2213	2
+	+	2223	0
+	+	291	2
+	+	293	0
+	+	202	1
+	+	2235	2
+	+	2240	0
+	+	2234	24
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/query/compile.go
+	*	1577088108	0
+	"	1143	2
+	^	1143	3
+	.	1129	3
+	+	1144	0
+	+	1129	3
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/tsdb/engine/tsm1/reader.go
+	*	1577087674	0
+	"	222	5
+	^	201	14
+	.	201	13
+	+	201	13
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/tsdb/index/tsi1/index.go
+	*	1577086213	0
+	"	993	2
+	^	993	3
+	.	988	3
+	+	981	0
+	+	994	9
+	+	994	0
+	+	988	3
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/tsdb/index/tsi1/partition.go
+	*	1577086199	0
+	"	759	15
+	^	771	0
+	.	771	0
+	+	757	62
+	+	758	0
+	+	757	90
+	+	760	16
+	+	772	47
+	+	763	8
+	+	765	0
+	+	772	0
+	+	765	0
+	+	766	16
+	+	768	15
+	+	769	17
+	+	772	0
+	+	771	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/tsdb/engine/tsm1/compact.go
+	*	1577086187	0
+	"	1632	3
+	^	1837	82
+	.	947	0
+	+	81	1
+	+	947	57
+	+	1612	17
+	+	1634	74
+	+	1647	2
+	+	1708	2
+	+	1712	5
+	+	1713	0
+	+	1745	0
+	+	1837	3
+	+	1838	0
+	+	947	0
+	+	948	0
+	+	947	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/NERD_tree_3
+	*	1577086182	0
+	"	32	6
+	.	1	0
+	+	1	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/tsdb/index/tsi1/tag_block.go
+	*	1577086177	0
+	"	323	0
+	.	234	0
+	+	234	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/tsdb/index/tsi1/index_file.go
+	*	1577086175	0
+	"	282	20
+	^	322	49
+	.	322	48
+	+	294	90
+	+	297	16
+	+	303	16
+	+	320	0
+	+	310	3
+	+	322	48
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/tsdb/index/tsi1/log_file.go
+	*	1577086173	0
+	"	351	48
+	^	351	49
+	.	351	48
+	+	1101	8
+	+	1072	0
+	+	1072	12
+	+	1101	8
+	+	1072	0
+	+	1046	0
+	+	1072	0
+	+	1	0
+	+	1049	0
+	+	1072	0
+	+	1049	0
+	+	1047	0
+	+	1062	16
+	+	1066	0
+	+	1071	0
+	+	1066	0
+	+	1066	30
+	+	1068	0
+	+	1070	0
+	+	1068	0
+	+	1053	15
+	+	1060	0
+	+	1061	0
+	+	1054	0
+	+	1060	0
+	+	1055	11
+	+	1053	61
+	+	1056	19
+	+	1101	0
+	+	1076	0
+	+	1097	0
+	+	1101	0
+	+	1097	0
+	+	1101	0
+	+	1056	9
+	+	1085	9
+	+	1043	2
+	+	1044	19
+	+	1066	5
+	+	1066	10
+	+	1067	10
+	+	1066	32
+	+	1068	39
+	+	1	0
+	+	1095	5
+	+	1095	9
+	+	1096	9
+	+	1095	32
+	+	1097	40
+	+	1068	70
+	+	1066	0
+	+	1095	0
+	+	1047	156
+	+	1047	34
+	+	1068	0
+	+	1047	0
+	+	391	0
+	+	414	0
+	+	422	37
+	+	414	40
+	+	422	39
+	+	426	37
+	+	1536	0
+	+	1542	38
+	+	1545	34
+	+	1412	2
+	+	1409	1
+	+	1412	0
+	+	1419	2
+	+	1420	0
+	+	1414	0
+	+	660	1
+	+	661	0
+	+	1542	0
+	+	1545	0
+	+	414	0
+	+	422	0
+	+	426	0
+	+	326	88
+	+	332	16
+	+	337	16
+	+	351	48
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/tsdb/index/tsi1/file_set.go
+	*	1577086172	0
+	"	589	0
+	^	463	72
+	.	463	71
+	+	376	97
+	+	378	40
+	+	381	55
+	+	594	0
+	+	376	0
+	+	378	0
+	+	381	0
+	+	339	88
+	+	349	0
+	+	348	0
+	+	342	3
+	+	463	71
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/tsdb/store.go
+	*	1577086169	0
+	"	1476	25
+	.	1625	0
+	+	1535	29
+	+	1550	30
+	+	1565	67
+	+	1618	61
+	+	1668	44
+	+	1679	43
+	+	1681	41
+	+	1618	0
+	+	1619	71
+	+	1625	71
+	+	1668	0
+	+	1679	0
+	+	1681	0
+	+	1535	0
+	+	1550	0
+	+	1565	0
+	+	1619	0
+	+	1625	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/tsdb/index/tsi1/tsi1.go
+	*	1577086168	0
+	"	8	0
+	.	8	0
+	+	310	25
+	+	312	36
+	+	310	67
+	+	8	8
+	+	310	0
+	+	312	0
+	+	8	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/tsdb/index.go
+	*	1577086166	0
+	"	2465	1
+	^	10	1
+	.	8	0
+	+	1798	26
+	+	1799	26
+	+	1804	0
+	+	1803	27
+	+	1804	27
+	+	1798	28
+	+	1799	0
+	+	1803	29
+	+	1804	0
+	+	1803	0
+	+	1799	0
+	+	1798	0
+	+	2522	0
+	+	2437	0
+	+	2453	29
+	+	2437	35
+	+	2453	0
+	+	2454	71
+	+	2462	32
+	+	2478	30
+	+	2486	29
+	+	2493	28
+	+	2506	29
+	+	2507	29
+	+	2454	50
+	+	2464	28
+	+	2469	29
+	+	2471	37
+	+	1691	0
+	+	1691	28
+	+	1188	43
+	+	2454	0
+	+	2462	0
+	+	2464	0
+	+	2478	0
+	+	2486	0
+	+	2493	0
+	+	2506	0
+	+	2507	0
+	+	1207	44
+	+	1189	39
+	+	2465	0
+	+	2464	52
+	+	1163	39
+	+	2464	68
+	+	10	1
+	+	1163	0
+	+	1189	0
+	+	1207	0
+	+	1691	0
+	+	2437	0
+	+	2464	0
+	+	2469	0
+	+	2471	0
+	+	8	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/NERD_tree_4
+	*	1577086161	0
+	"	24	12
+	.	1	0
+	+	1	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/cluster/statement_executor.go
+	*	1577086159	0
+	"	1040	1
+	.	1040	0
+	+	989	25
+	+	999	25
+	+	1032	26
+	+	1037	26
+	+	1040	25
+	+	999	26
+	+	989	26
+	+	1032	27
+	+	1037	28
+	+	1040	26
+	+	989	0
+	+	999	0
+	+	1032	0
+	+	1037	0
+	+	1040	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/cluster/service.go
+	*	1577086143	0
+	"	201	0
+	.	310	0
+	+	285	103
+	+	421	173
+	+	285	0
+	+	421	0
+	+	368	33
+	+	310	31
+	+	376	89
+	+	372	0
+	+	373	0
+	+	372	31
+	+	373	31
+	+	368	0
+	+	372	0
+	+	373	0
+	+	310	0
+	+	376	0
+	+	310	0
+
+> ~/works/qtsdb_new/qtsdb/deploy/VERSION
+	*	1576826965	0
+	"	1	5
+	^	1	6
+	.	1	5
+	+	1	5
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/query/executor.go
+	*	1576824866	0
+	"	334	10
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/pkg/tar/stream.go
+	*	1576820567	0
+	"	118	17
+
+> /usr/share/vim/vim80/Mru/LeaderF
+	*	1576813133	0
+	"	1	0
+	.	1	0
+	+	1	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/__Tagbar__.1
+	*	1576813011	0
+	"	87	3
+	.	127	0
+	+	127	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/NERD_tree_2
+	*	1576806071	0
+	"	50	0
+	.	1	0
+	+	1	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/influx-data/data/test_1/default/28/index/6/L0-00000001.tsl
+	*	1576805839	0
+	"	1	1
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/influx-data/data/test_1/default/28/index/0/L0-00000001.tsl
+	*	1576805786	0
+	"	1	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/influx-data/data/test_1/default/28/index/0/MANIFEST
+	*	1576805782	0
+	"	37	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/conf/data.conf1
+	*	1576805741	0
+	"	43	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/tsdb/index/index.go
+	*	1576805694	0
+	"	1	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/query/iterator.gen.go
+	*	1576751887	0
+	"	1121	24
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/tsdb/engine/tsm1/iterator.gen.go
+	*	1576751885	0
+	"	36	1
+	^	2292	38
+	.	2292	37
+	+	61	17
+	+	72	6
+	+	75	0
+	+	72	0
+	+	75	0
+	+	75	3
+	+	75	0
+	+	77	14
+	+	75	0
+	+	77	0
+	+	75	0
+	+	67	0
+	+	69	0
+	+	65	0
+	+	45	12
+	+	41	9
+	+	47	0
+	+	48	0
+	+	50	0
+	+	52	0
+	+	56	0
+	+	49	0
+	+	51	0
+	+	53	0
+	+	55	0
+	+	56	0
+	+	54	0
+	+	52	0
+	+	50	0
+	+	2424	0
+	+	2423	22
+	+	2424	25
+	+	2545	0
+	+	2546	25
+	+	40	17
+	+	61	18
+	+	82	20
+	+	87	13
+	+	89	6
+	+	87	7
+	+	89	12
+	+	94	0
+	+	91	9
+	+	83	7
+	+	94	0
+	+	93	9
+	+	87	17
+	+	87	23
+	+	499	25
+	+	500	25
+	+	621	0
+	+	622	25
+	+	99	0
+	+	111	0
+	+	99	19
+	+	100	5
+	+	40	40
+	+	82	46
+	+	99	41
+	+	103	0
+	+	106	7
+	+	104	12
+	+	103	0
+	+	1461	24
+	+	1462	25
+	+	1583	0
+	+	1584	25
+	+	26	44
+	+	27	6
+	+	35	12
+	+	33	7
+	+	31	32
+	+	22	8
+	+	34	0
+	+	36	0
+	+	1943	24
+	+	1944	25
+	+	2065	0
+	+	2066	25
+	+	287	1
+	+	315	1
+	+	368	37
+	+	768	1
+	+	796	1
+	+	802	0
+	+	849	37
+	+	1249	1
+	+	1277	1
+	+	1330	37
+	+	1730	1
+	+	1764	0
+	+	1811	37
+	+	2211	1
+	+	2239	1
+	+	2292	37
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/tsdb/engine.go
+	*	1576751884	0
+	"	130	2
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/query/cursor.go
+	*	1576751882	0
+	"	366	4
+	^	320	2
+	.	317	0
+	+	148	1
+	+	166	1
+	+	169	11
+	+	173	2
+	+	201	0
+	+	207	10
+	+	357	1
+	+	382	1
+	+	387	10
+	+	388	2
+	+	399	8
+	+	173	2
+	+	223	0
+	+	228	0
+	+	244	1
+	+	317	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/tsdb/engine/tsm1/ring.go
+	*	1576751881	0
+	"	201	0
+	.	87	0
+	+	249	0
+	+	238	0
+	+	243	26
+	+	251	21
+	+	243	21
+	+	87	43
+	+	87	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/tsdb/engine/tsm1/batch_float.go
+	*	1576751881	0
+	"	308	1
+	.	308	0
+	+	308	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/tsdb/field_validator.go
+	*	1576751879	0
+	"	32	0
+
+> ~/works/qtsdb_new/qtsdb/meta-server/src/github.com/influxdata/influxdb/tsdb/shard.go
+	*	1576751862	0
+	"	1	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/tsdb/engine/tsm1/cache.go
+	*	1576751787	0
+	"	89	69
+	^	25	6
+	.	25	0
+	+	113	55
+	+	113	87
+	+	113	6
+	+	74	31
+	+	83	92
+	+	74	19
+	+	83	5
+	+	84	69
+	+	83	0
+	+	115	0
+	+	114	5
+	+	10	7
+	+	84	28
+	+	115	26
+	+	84	26
+	+	115	0
+	+	114	4
+	+	25	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/query/iterator.go
+	*	1576751605	0
+	"	522	2
+	^	1334	9
+	.	1334	8
+	+	1335	0
+	+	1334	8
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/NERD_tree_8
+	*	1576751604	0
+	"	22	8
+	.	1	0
+	+	1	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/__Tagbar__.7
+	*	1576751555	0
+	"	50	3
+	.	120	0
+	+	120	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/NERD_tree_10
+	*	1576748318	0
+	"	30	4
+	.	1	0
+	+	1	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/tsdb/series_file.go
+	*	1576746108	0
+	"	80	3
+	.	203	29
+	+	203	29
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/tsdb/index/tsi1/cache.go
+	*	1576743698	0
+	"	167	4
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/bin/test
+	*	1576739809	0
+	"	1	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/tsdb/engine/tsm1/iterator.gen.go.tmpl
+	*	1576666145	0
+	"	282	23
+	^	278	38
+	.	278	37
+	+	197	36
+	+	230	2
+	+	231	0
+	+	225	0
+	+	226	9
+	+	227	9
+	+	228	9
+	+	229	7
+	+	278	37
+
+> ~/works/qtsdb_new/qtsdb/meta-server/src/github.com/influxdata/influxdb/tsdb/engine/tsm1/iterator.gen.go
+	*	1576665451	0
+	"	185	11
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/services/continuous_querier/service.go
+	*	1576660431	0
+	"	578	0
+	.	578	0
+	+	576	0
+	+	578	0
+
+> ~/works/qtsdb_new/qtsdb/data-proxy-server/src/github.com/influxdata/influxdb/query/math.go
+	*	1576659954	0
+	"	103	5
+	^	103	6
+	.	103	5
+	+	101	0
+	+	104	8
+	+	101	13
+	+	103	5
+
+> ~/opensources/linux-5.4.2/arch/x86/kernel/traps.c
+	*	1576217583	0
+	"	932	2
+
+> ~/opensources/linux-5.4.2/arch/x86/include/asm/desc_defs.h
+	*	1576217545	0
+	"	76	0
+
+> ~/opensources/linux-5.4.2/arch/x86/kernel/idt.c
+	*	1576217544	0
+	"	215	0
+
+> ~/opensources/linux-5.4.2/arch/x86/include/asm/desc.h
+	*	1576211210	0
+	"	436	0

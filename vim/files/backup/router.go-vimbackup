@@ -1,0 +1,28 @@
+// @APIVersion 1.0.0
+// @Title beego Test API
+// @Description beego has a very cool tools to autogenerate documents for your API
+// @Contact astaxie@gmail.com
+// @TermsOfServiceUrl http://beego.me/
+// @License Apache 2.0
+// @LicenseUrl http://www.apache.org/licenses/LICENSE-2.0.html
+package routers
+
+import (
+	"admin_server/controllers"
+	"github.com/astaxie/beego"
+)
+
+func init() {
+	beego.Router("/config/add", &controllers.ConfigController{}, "post:CreateConfig")
+	beego.Router("/config/update", &controllers.ConfigController{}, "post:UpdateConfig")
+	beego.Router("/config/delete", &controllers.ConfigController{}, "post:DeleteConfig")
+	beego.Router("/config/getapplist", &controllers.ConfigController{}, "post:GetAppList")
+	beego.Router("/config/getconfiglistbyapp", &controllers.ConfigController{}, "post:GetConfigListByApp")
+	beego.Router("/config/getconfig", &controllers.ConfigController{}, "post:GetConfig")
+	beego.Router("/config/gethistorylist", &controllers.ConfigController{}, "post:GetHistoryList")
+	beego.Router("/config/rollbackconfig", &controllers.ConfigController{}, "post:RollbackConfig")
+	beego.Router("/config/getsyncstatus", &controllers.ConfigController{}, "post:GetSyncStatus")
+	beego.Router("/config/getsubbusinesslist", &controllers.ConfigController{}, "get:GetSubBusinessList")
+	beego.Router("/config/batchadd", &controllers.ConfigController{}, "post:BatchCreateConfig")
+	beego.Router("/config/batchdelete", &controllers.ConfigController{}, "post:BatchDeleteConfig")
+}

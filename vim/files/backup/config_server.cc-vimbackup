@@ -1,0 +1,239 @@
+#include <chrono>
+#include <glog/logging.h>
+
+#include "config_server.h"
+#include "util.h"
+#include "log_cleaner.h"
+#include "http_server.h"
+
+namespace peanuts {
+
+const std::string ConfigServer::SERVER_IP = "server_ip";
+const std::string ConfigServer::SERVER_PORT = "server_port";
+const std::string ConfigServer::WORKER_NUM = "worker_num";
+const std::string ConfigServer::REDIS_IP = "redis_ip";
+const std::string ConfigServer::REDIS_PORT = "redis_port";
+const std::string ConfigServer::REDIS_PWD = "redis_pwd";
+const std::string ConfigServer::MAX_REVISION_INTERVAL = "max_revision_interval";
+const std::string ConfigServer::KEY_PREFIX = "key_prefix";
+const std::string ConfigServer::RECONN_INTERVAL = "reconn_interval";
+const std::string ConfigServer::DB_NAME = "db_name";
+const std::string ConfigServer::ADDRESS = "address";
+const std::string ConfigServer::REQUEST_TIMEOUT = "request_timeout";
+const std::string ConfigServer::LOG_CLEAN_DAYS = "log_clean_days";
+const std::string ConfigServer::SERVER_NAME = "server_name";
+const std::string ConfigServer::HTTP_CONFIG_ONLY = "http_only";
+const std::string ConfigServer::HTTP_CONFIG_IP = "http_ip";
+const std::string ConfigServer::HTTP_CONFIG_PORT = "http_port";
+const std::string ConfigServer::HTTP_CONFIG_WORK_THREAD_SIZE = "http_work_thread_size";
+
+ConfigServer::ConfigServer(const Option& opt):
+  option_(opt),
+  inited_(false),
+  is_start_(false) {
+
+}
+
+ConfigServer::~ConfigServer() {
+  Stop();
+}
+
+int ConfigServer::Init() {
+  std::string value;
+  if (!inited_) {
+    std::string http_config_value("");
+    if (0 == option_.GetValue(HTTP_CONFIG_ONLY, &http_config_value)) {
+      http_config_.http_only = ("1" == http_config_value ? true : false);
+    }
+
+    if (!http_config_.http_only) {
+      if (option_.GetValue(SERVER_IP, &server_ip_) == -1) {
+        LOG(ERROR) << "get server_ip error";
+        return -1;
+      }
+
+      if (!option_.GetValue(SERVER_PORT, &value) == 0
+          || ((server_port_ = StrToNum<uint16_t>(value)) == 0)) {
+        LOG(ERROR) << "get server_port error";
+        return -1;
+      }
+
+      if (!option_.GetValue(WORKER_NUM, &value) == 0
+          || ((worker_num_ = StrToNum<uint32_t>(value)) == 0)) {
+        LOG(ERROR) << "get worker_num error";
+        return -1;
+      }
+
+      if (option_.GetValue(REDIS_IP, &redis_ip_) == -1) {
+        LOG(ERROR) << "get redis_ip error";
+        return -1;
+      }
+
+      if (!option_.GetValue(REDIS_PORT, &value) == 0
+          || ((redis_port_ = StrToNum<uint16_t>(value)) == 0)) {
+        LOG(ERROR) << "get redis_port error";
+        return -1;
+      }
+
+      if (option_.GetValue(REDIS_PWD, &redis_pwd_) == -1) {
+        LOG(ERROR) << "get redis_pwd error";
+        return -1;
+      }
+    } else {
+      if (option_.GetValue(HTTP_CONFIG_IP, &http_config_.ip) == -1) {
+        LOG(ERROR) << "get http ip error";
+        return -1;
+      }
+
+      if (!option_.GetValue(HTTP_CONFIG_PORT, &http_config_value) == 0
+          || ((http_config_.port = StrToNum<uint16_t>(http_config_value)) == 0)) {
+        LOG(ERROR) << "get http port error";
+        return -1;
+      }
+
+      if (!option_.GetValue(HTTP_CONFIG_WORK_THREAD_SIZE, &http_config_value) == 0
+          || ((http_config_.work_thread_size = StrToNum<unsigned int>(http_config_value)) == 0)) {
+        http_config_.work_thread_size = 0;
+      }
+    }//if (!http_config_.http_only)
+
+    if (!option_.GetValue(MAX_REVISION_INTERVAL, &value) == 0
+      || ((max_revision_interval_ = StrToNum<int64_t>(value)) == 0)) {
+      LOG(ERROR) << "get max_revision_interval error";
+      return -1;
+    }
+
+    if (option_.GetValue(KEY_PREFIX, &key_prefix_) == -1) {
+      LOG(ERROR) << "get key_prefix error";
+      return -1;
+    }
+
+    if (option_.GetValue(DB_NAME, &db_name_) == -1) {
+      LOG(ERROR) << "get db_name error";
+      return -1;
+    }
+
+    if (option_.GetValue(ADDRESS, &address_) == -1) {
+      LOG(ERROR) << "get address error";
+      return -1;
+    }
+
+    if (!option_.GetValue(RECONN_INTERVAL, &value) == 0
+      || ((reconn_interval_ = StrToNum<int64_t>(value)) == 0)) {
+      LOG(ERROR) << "get reconn_interval error";
+      return -1;
+    }
+
+    if (!option_.GetValue(REQUEST_TIMEOUT, &value) == 0
+      || ((request_timeout_ = StrToNum<uint32_t>(value)) == 0)) {
+      LOG(ERROR) << "get request_timeout error";
+      return -1;
+    }
+
+    if (!option_.GetValue(LOG_CLEAN_DAYS, &value) == 0
+      || ((log_clean_days_ = StrToNum<uint32_t>(value)) == 0)) {
+      LOG(ERROR) << "get log_clean_days error";
+      return -1;
+    }
+    log_dir_ = FLAGS_log_dir;
+    max_log_size_ = FLAGS_max_log_size;
+
+    server_name_ = "config-server";
+    option_.GetValue("server_name", &server_name_);
+
+    DLOG(INFO) << "get conf items ok";
+  } else {
+    LOG(ERROR) << "had inited";
+    return -1;
+  }
+
+  if (!http_config_.http_only) {
+    updater_thread_ = std::make_shared<Updater>();
+  }
+
+  configs_ = std::make_shared<store::ConfigStorage>(worker_num_ * 1.5, 100000, updater_thread_);
+
+  std::unique_ptr<store::EtcdClient> etcd_client(new store::EtcdClient(address_, request_timeout_));
+  int64_t current_revision = configs_->Init(key_prefix_, db_name_, true, etcd_client);
+  if (-1 == current_revision) {
+    LOG(ERROR) << "ConfigStorage Init Failed.";
+    return -1;
+  }
+
+  watch_thread_.reset(
+      new store::WatchThread(reconn_interval_, key_prefix_, current_revision, std::move(etcd_client), configs_));
+
+  {
+    LogCleaner log_cleaner(log_dir_, log_clean_days_, max_log_size_, server_name_);
+    LOG(INFO) << "LogCleaner constructed...";
+    feedback_thread_ = std::shared_ptr<FeedBack>(new FeedBack(redis_ip_, redis_port_, redis_pwd_, log_cleaner,worker_num_, MAX_TASK_QUEUE_SIZE));
+  }
+
+  if (!http_config_.http_only) {
+    Socket socket(server_port_, server_ip_);
+    acceptor_thread_ = std::make_shared<Acceptor>(socket, worker_num_, feedback_thread_, configs_);
+
+    updater_thread_->SetAcceptor(acceptor_thread_);
+  } else {
+    http_server_ = std::make_unique<qcm::http::HttpServer>(configs_);
+    if (!http_server_) {
+      LOG(FATAL) << "Failed make Http Server";
+    }
+  }
+
+  inited_ = true;
+  LOG(INFO) << "server inited ok...";
+  return 0;
+}
+
+void ConfigServer::Start() {
+  DLOG(INFO) << "threads starting...";
+  if (inited_ && !is_start_) {
+    watch_thread_->Start();
+    LOG(INFO) << "watch thread started...";
+
+    if (!http_config_.http_only) {
+      acceptor_thread_->Start();
+      LOG(INFO) << "acceptor thread started...";
+
+      updater_thread_->Start();
+      LOG(INFO) << "updater thread started...";
+    }
+
+    feedback_thread_->Start();
+    LOG(INFO) << "feedback thread started...";
+
+    is_start_ = true;
+    LOG(INFO) << " all threads... start ok";
+
+    if (!http_config_.http_only) {
+      acceptor_thread_->Join();
+    } else if (http_server_) {
+      http_server_->Start(http_config_, false);
+    }
+  }
+}
+
+int ConfigServer::Stop() {
+  std::cout << "111" << std::endl;
+  if (is_start_) {
+    if (!http_config_.http_only) {
+      updater_thread_->Stop();
+      LOG(INFO) << "updater thread stoped!!!";
+
+      acceptor_thread_->Stop();
+    } else if (http_server_) {
+  std::cout << "222" << std::endl;
+      http_server_->Stop();
+    }
+
+    feedback_thread_->Stop();
+    LOG(INFO) << "feedback thread stoped!!!";
+
+    is_start_ = false;
+    return 0;
+  }
+  return -1;
+}
+
+} //namespace peanuts

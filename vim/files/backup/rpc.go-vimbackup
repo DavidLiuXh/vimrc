@@ -1,0 +1,925 @@
+package cluster
+
+import (
+	"errors"
+	"fmt"
+	"github.com/gogo/protobuf/proto"
+	"github.com/influxdata/influxdb/cluster/internal"
+	"github.com/influxdata/influxdb/models"
+	"github.com/influxdata/influxdb/query"
+	"github.com/influxdata/influxql"
+	"regexp"
+	"time"
+)
+
+//go:generate protoc --gogo_out=. internal/data.proto
+
+// WritePointsRequest represents a request to write point data to the cluster
+type WritePointsRequest struct {
+	Database         string
+	RetentionPolicy  string
+	ConsistencyLevel models.ConsistencyLevel
+	Points           []models.Point
+}
+
+// AddPoint adds a point to the WritePointRequest with field key 'value'
+func (w *WritePointsRequest) AddPoint(name string, value interface{}, timestamp time.Time, tags map[string]string) {
+	pt, err := models.NewPoint(
+		name, models.NewTags(tags), map[string]interface{}{"value": value}, timestamp,
+	)
+	if err != nil {
+		return
+	}
+	w.Points = append(w.Points, pt)
+}
+
+// WriteShardRequest represents the a request to write a slice of points to a shard
+type WriteShardRequest struct {
+	pb internal.WriteShardRequest
+}
+
+// WriteShardResponse represents the response returned from a remote WriteShardRequest call
+type WriteShardResponse struct {
+	pb internal.WriteShardResponse
+}
+
+// SetShardID sets the ShardID
+func (w *WriteShardRequest) SetShardID(id uint64) { w.pb.ShardID = &id }
+
+// ShardID gets the ShardID
+func (w *WriteShardRequest) ShardID() uint64 { return w.pb.GetShardID() }
+
+func (w *WriteShardRequest) SetDatabase(db string) { w.pb.Database = &db }
+
+func (w *WriteShardRequest) SetRetentionPolicy(rp string) { w.pb.RetentionPolicy = &rp }
+
+func (w *WriteShardRequest) Database() string { return w.pb.GetDatabase() }
+
+func (w *WriteShardRequest) RetentionPolicy() string { return w.pb.GetRetentionPolicy() }
+
+// Points returns the time series Points
+func (w *WriteShardRequest) Points() []models.Point { return w.unmarshalPoints() }
+
+// AddPoint adds a new time series point
+func (w *WriteShardRequest) AddPoint(name string, value interface{}, timestamp time.Time, tags map[string]string) {
+	pt, err := models.NewPoint(
+		name, models.NewTags(tags), map[string]interface{}{"value": value}, timestamp,
+	)
+	if err != nil {
+		return
+	}
+	w.AddPoints([]*models.Point{pt})
+}
+
+// AddPoints adds a new time series point
+func (w *WriteShardRequest) AddPoints(points []*models.Point) {
+	for _, p := range points {
+		b, err := p.MarshalBinary()
+		if err != nil {
+			// A error here means that we create a point higher in the stack that we could
+			// not marshal to a byte slice.  If that happens, the endpoint that created that
+			// point needs to be fixed.
+			panic(fmt.Sprintf("failed to marshal point: `%v`: %v", p, err))
+		}
+		w.pb.Points = append(w.pb.Points, b)
+	}
+}
+
+// MarshalBinary encodes the object to a binary format.
+func (w *WriteShardRequest) MarshalBinary() ([]byte, error) {
+	return proto.Marshal(&w.pb)
+}
+
+// UnmarshalBinary populates WritePointRequest from a binary format.
+func (w *WriteShardRequest) UnmarshalBinary(buf []byte) error {
+	if err := proto.Unmarshal(buf, &w.pb); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (w *WriteShardRequest) unmarshalPoints() []models.Point {
+	points := make([]models.Point, len(w.pb.GetPoints()))
+	for i, p := range w.pb.GetPoints() {
+		pt, err := models.NewPointFromBytes(p)
+		if err != nil {
+			// A error here means that one node created a valid point and sent us an
+			// unparseable version.  We could log and drop the point and allow
+			// anti-entropy to resolve the discrepancy, but this shouldn't ever happen.
+			panic(fmt.Sprintf("failed to parse point: `%v`: %v", string(p), err))
+		}
+
+		points[i] = pt
+	}
+	return points
+}
+
+// SetCode sets the Code
+func (w *WriteShardResponse) SetCode(code int) { w.pb.Code = proto.Int32(int32(code)) }
+
+// SetMessage sets the Message
+func (w *WriteShardResponse) SetMessage(message string) { w.pb.Message = &message }
+
+// Code returns the Code
+func (w *WriteShardResponse) Code() int { return int(w.pb.GetCode()) }
+
+// Message returns the Message
+func (w *WriteShardResponse) Message() string { return w.pb.GetMessage() }
+
+// MarshalBinary encodes the object to a binary format.
+func (w *WriteShardResponse) MarshalBinary() ([]byte, error) {
+	return proto.Marshal(&w.pb)
+}
+
+// UnmarshalBinary populates WritePointRequest from a binary format.
+func (w *WriteShardResponse) UnmarshalBinary(buf []byte) error {
+	if err := proto.Unmarshal(buf, &w.pb); err != nil {
+		return err
+	}
+	return nil
+}
+
+// ExecuteStatementRequest represents the a request to execute a statement on a node.
+type ExecuteStatementRequest struct {
+	pb internal.ExecuteStatementRequest
+}
+
+// Statement returns the InfluxQL statement.
+func (r *ExecuteStatementRequest) Statement() string { return r.pb.GetStatement() }
+
+// SetStatement sets the InfluxQL statement.
+func (r *ExecuteStatementRequest) SetStatement(statement string) {
+	r.pb.Statement = proto.String(statement)
+}
+
+// Database returns the database name.
+func (r *ExecuteStatementRequest) Database() string { return r.pb.GetDatabase() }
+
+// SetDatabase sets the database name.
+func (r *ExecuteStatementRequest) SetDatabase(database string) { r.pb.Database = proto.String(database) }
+
+// MarshalBinary encodes the object to a binary format.
+func (r *ExecuteStatementRequest) MarshalBinary() ([]byte, error) {
+	return proto.Marshal(&r.pb)
+}
+
+// UnmarshalBinary populates ExecuteStatementRequest from a binary format.
+func (r *ExecuteStatementRequest) UnmarshalBinary(buf []byte) error {
+	if err := proto.Unmarshal(buf, &r.pb); err != nil {
+		return err
+	}
+	return nil
+}
+
+// ExecuteStatementResponse represents the response returned from a remote ExecuteStatementRequest call.
+type ExecuteStatementResponse struct {
+	pb internal.WriteShardResponse
+}
+
+// Code returns the response code.
+func (w *ExecuteStatementResponse) Code() int { return int(w.pb.GetCode()) }
+
+// SetCode sets the Code
+func (w *ExecuteStatementResponse) SetCode(code int) { w.pb.Code = proto.Int32(int32(code)) }
+
+// Message returns the repsonse message.
+func (w *ExecuteStatementResponse) Message() string { return w.pb.GetMessage() }
+
+// SetMessage sets the Message
+func (w *ExecuteStatementResponse) SetMessage(message string) { w.pb.Message = &message }
+
+// MarshalBinary encodes the object to a binary format.
+func (w *ExecuteStatementResponse) MarshalBinary() ([]byte, error) {
+	return proto.Marshal(&w.pb)
+}
+
+// UnmarshalBinary populates ExecuteStatementResponse from a binary format.
+func (w *ExecuteStatementResponse) UnmarshalBinary(buf []byte) error {
+	if err := proto.Unmarshal(buf, &w.pb); err != nil {
+		return err
+	}
+	return nil
+}
+
+// CreateIteratorRequest represents a request to create a remote iterator.
+type CreateIteratorRequest struct {
+	ShardIDs    []uint64
+	Measurement influxql.Measurement
+	Opt         query.IteratorOptions
+	Ctx         query.ExecutionContext
+}
+
+// MarshalBinary encodes r to a binary format.
+func (r *CreateIteratorRequest) MarshalBinary() ([]byte, error) {
+	buf, err := r.Opt.MarshalBinary()
+	if err != nil {
+		return nil, err
+	}
+	return proto.Marshal(&internal.CreateIteratorRequest{
+		ShardIDs: r.ShardIDs,
+		Opt:      buf,
+	})
+}
+
+// UnmarshalBinary decodes data into r.
+func (r *CreateIteratorRequest) UnmarshalBinary(data []byte) error {
+	var pb internal.CreateIteratorRequest
+	if err := proto.Unmarshal(data, &pb); err != nil {
+		return err
+	}
+
+	r.ShardIDs = pb.GetShardIDs()
+	if err := r.Opt.UnmarshalBinary(pb.GetOpt()); err != nil {
+		return err
+	}
+	return nil
+}
+
+// CreateIteratorResponse represents a response from remote iterator creation.
+type CreateIteratorResponse struct {
+	Err error
+}
+
+// MarshalBinary encodes r to a binary format.
+func (r *CreateIteratorResponse) MarshalBinary() ([]byte, error) {
+	var pb internal.CreateIteratorResponse
+	if r.Err != nil {
+		pb.Err = proto.String(r.Err.Error())
+	}
+	return proto.Marshal(&pb)
+}
+
+// UnmarshalBinary decodes data into r.
+func (r *CreateIteratorResponse) UnmarshalBinary(data []byte) error {
+	var pb internal.CreateIteratorResponse
+	if err := proto.Unmarshal(data, &pb); err != nil {
+		return err
+	}
+	if pb.Err != nil {
+		r.Err = errors.New(pb.GetErr())
+	}
+	return nil
+}
+
+// FieldDimensionsRequest represents a request to retrieve unique fields & dimensions.
+type FieldDimensionsRequest struct {
+	ShardIDs []uint64
+	Sources  influxql.Sources
+}
+
+// MarshalBinary encodes r to a binary format.
+func (r *FieldDimensionsRequest) MarshalBinary() ([]byte, error) {
+	buf, err := r.Sources.MarshalBinary()
+	if err != nil {
+		return nil, err
+	}
+	return proto.Marshal(&internal.FieldDimensionsRequest{
+		ShardIDs: r.ShardIDs,
+		Sources:  buf,
+	})
+}
+
+// UnmarshalBinary decodes data into r.
+func (r *FieldDimensionsRequest) UnmarshalBinary(data []byte) error {
+	var pb internal.FieldDimensionsRequest
+	if err := proto.Unmarshal(data, &pb); err != nil {
+		return err
+	}
+
+	r.ShardIDs = pb.GetShardIDs()
+	if err := r.Sources.UnmarshalBinary(pb.GetSources()); err != nil {
+		return err
+	}
+	return nil
+}
+
+// FieldDimensionsResponse represents a response from remote iterator creation.
+/*
+type FieldDimensionsResponse struct {
+	Fields     map[string]struct{}
+	Dimensions map[string]struct{}
+	Err        error
+}
+*/
+
+type FieldDimensionsResponse struct {
+	Mapping map[influxql.Measurement]fd
+	Err     error
+}
+
+// MarshalBinary encodes r to a binary format.
+func (r *FieldDimensionsResponse) MarshalBinary() ([]byte, error) {
+	/*
+		pb.Fields = make([]string, 0, len(r.Fields))
+		for k := range r.Fields {
+			pb.Fields = append(pb.Fields, k)
+		}
+
+		pb.Dimensions = make([]string, 0, len(r.Dimensions))
+		for k := range r.Dimensions {
+			pb.Dimensions = append(pb.Dimensions, k)
+		}
+
+		if r.Err != nil {
+			pb.Err = proto.String(r.Err.Error())
+		}
+	*/
+	var pb internal.FieldDimensionsResponse
+	mfds := make([]*internal.MFD, 0, len(r.Mapping))
+
+	for k, v := range r.Mapping {
+		var mfd internal.MFD
+		pb_mm := EncodeMeasurement(&k)
+		if b_mm, err := proto.Marshal(pb_mm); err != nil {
+			return nil, err
+		} else {
+			mfd.Measurement = b_mm
+		}
+
+		fds := make([]*internal.FDUnit, len(v.F))
+		i := 0
+		for k2, v2 := range v.F {
+			var fdkv internal.FDUnit
+			fdkv.Field = proto.String(k2)
+			fdkv.DataType = proto.Int32(int32(v2))
+			fds[i] = &fdkv
+			i++
+		}
+		mfd.FieldDimension = &internal.FD{}
+		mfd.FieldDimension.F = fds
+
+		i = 0
+		ds := make([]string, len(v.D))
+		for k3, _ := range v.D {
+			ds[i] = k3
+			i++
+		}
+		mfd.FieldDimension.D = ds
+		mfds = append(mfds, &mfd)
+	}
+	pb.Mapping = mfds
+
+	if r.Err != nil {
+		pb.Err = proto.String(r.Err.Error())
+	}
+
+	return proto.Marshal(&pb)
+}
+
+// UnmarshalBinary decodes data into r.
+func (r *FieldDimensionsResponse) UnmarshalBinary(data []byte) error {
+	var pb internal.FieldDimensionsResponse
+	if err := proto.Unmarshal(data, &pb); err != nil {
+		return err
+	}
+	/*
+		r.Fields = make(map[string]struct{}, len(pb.GetFields()))
+		for _, s := range pb.GetFields() {
+			r.Fields[s] = struct{}{}
+		}
+
+		r.Dimensions = make(map[string]struct{}, len(pb.GetDimensions()))
+		for _, s := range pb.GetDimensions() {
+			r.Dimensions[s] = struct{}{}
+		}
+	*/
+	r.Mapping = make(map[influxql.Measurement]fd, len(pb.GetMapping()))
+	for _, mfd := range pb.GetMapping() {
+		var fd_map fd
+		fd_map.F = make(map[string]influxql.DataType, len(mfd.GetFieldDimension().GetF()))
+		for _, unit := range mfd.GetFieldDimension().GetF() {
+			fd_map.F[unit.GetField()] = influxql.DataType(unit.GetDataType())
+		}
+
+		fd_map.D = make(map[string]struct{}, len(mfd.GetFieldDimension().GetD()))
+		for _, d := range mfd.GetFieldDimension().GetD() {
+			fd_map.D[d] = struct{}{}
+		}
+
+		var pb_mm internal.Measurement
+		if err := proto.Unmarshal(mfd.Measurement, &pb_mm); err != nil {
+			return nil
+		}
+
+		if mm, err := DecodeMeasurement(&pb_mm); err != nil {
+			return nil
+		} else {
+			r.Mapping[*mm] = fd_map
+		}
+	}
+
+	if pb.Err != nil {
+		r.Err = errors.New(pb.GetErr())
+	}
+	return nil
+}
+
+//added by zk
+type FieldTypeRequest struct {
+	ShardIDs []uint64
+	Mapping  map[influxql.Measurement]fd
+}
+
+func (r *FieldTypeRequest) MarshalBinary() ([]byte, error) {
+	var pb internal.FieldTypeRequest
+
+	mfds := make([]*internal.MFD, 0, len(r.Mapping))
+	for k, v := range r.Mapping {
+		var mfd internal.MFD
+		pb_mm := EncodeMeasurement(&k)
+		if b_mm, err := proto.Marshal(pb_mm); err != nil {
+			return nil, err
+		} else {
+			mfd.Measurement = b_mm
+		}
+
+		fds := make([]*internal.FDUnit, len(v.F))
+		i := 0
+		for k2, v2 := range v.F {
+			var fdkv internal.FDUnit
+			fdkv.Field = proto.String(k2)
+			fdkv.DataType = proto.Int32(int32(v2))
+			fds[i] = &fdkv
+			i++
+		}
+		mfd.FieldDimension = &internal.FD{}
+		mfd.FieldDimension.F = fds
+
+		i = 0
+		ds := make([]string, len(v.D))
+		for k3, _ := range v.D {
+			ds[i] = k3
+			i++
+		}
+		mfd.FieldDimension.D = ds
+		mfds = append(mfds, &mfd)
+	}
+
+	pb.Mapping = mfds
+	pb.ShardIDs = r.ShardIDs
+
+	return proto.Marshal(&pb)
+}
+
+func (r *FieldTypeRequest) UnmarshalBinary(data []byte) error {
+	var pb internal.FieldTypeRequest
+	if err := proto.Unmarshal(data, &pb); err != nil {
+		return err
+	}
+
+	r.Mapping = make(map[influxql.Measurement]fd, len(pb.GetMapping()))
+	for _, mfd := range pb.GetMapping() {
+		var fd_map fd
+		fd_map.F = make(map[string]influxql.DataType, len(mfd.GetFieldDimension().GetF()))
+		for _, unit := range mfd.GetFieldDimension().GetF() {
+			fd_map.F[unit.GetField()] = influxql.DataType(unit.GetDataType())
+		}
+
+		fd_map.D = make(map[string]struct{}, len(mfd.GetFieldDimension().GetD()))
+		for _, d := range mfd.GetFieldDimension().GetD() {
+			fd_map.D[d] = struct{}{}
+		}
+
+		var pb_mm internal.Measurement
+		if err := proto.Unmarshal(mfd.Measurement, &pb_mm); err != nil {
+			return nil
+		}
+
+		if mm, err := DecodeMeasurement(&pb_mm); err != nil {
+			return nil
+		} else {
+			r.Mapping[*mm] = fd_map
+		}
+	}
+
+	r.ShardIDs = pb.GetShardIDs()
+	return nil
+}
+
+/*
+// MarshalBinary encodes r to a binary format.
+func (r *FieldTypeRequest) MarshalBinary() ([]byte, error) {
+	//buf, err := r.Sources.MarshalBinary()
+	//if err != nil {
+	//	return nil, err
+	//}
+	return proto.Marshal(&internal.FieldDimensionsRequest{
+		ShardIDs: r.ShardIDs,
+		//Sources:  buf,
+	})
+}
+
+// UnmarshalBinary decodes data into r.
+func (r *FieldTypeRequest) UnmarshalBinary(data []byte) error {
+	//var pb internal.FieldDimensionsRequest
+	//if err := proto.Unmarshal(data, &pb); err != nil {
+	//	return err
+	//}
+
+	//r.ShardIDs = pb.GetShardIDs()
+	//if err := r.Sources.UnmarshalBinary(pb.GetSources()); err != nil {
+	//	return err
+	//}
+	return nil
+}
+*/
+type FieldTypeResponse struct {
+	Mapping map[influxql.Measurement]fd
+	Err     error
+}
+
+func (r *FieldTypeResponse) MarshalBinary() ([]byte, error) {
+	var pb internal.FieldTypeResponse
+	mfds := make([]*internal.MFD, 0, len(r.Mapping))
+
+	for k, v := range r.Mapping {
+		var mfd internal.MFD
+		pb_mm := EncodeMeasurement(&k)
+		if b_mm, err := proto.Marshal(pb_mm); err != nil {
+			return nil, err
+		} else {
+			mfd.Measurement = b_mm
+		}
+
+		fds := make([]*internal.FDUnit, len(v.F))
+		i := 0
+		for k2, v2 := range v.F {
+			var fdkv internal.FDUnit
+			fdkv.Field = proto.String(k2)
+			fdkv.DataType = proto.Int32(int32(v2))
+			fds[i] = &fdkv
+			i++
+		}
+		mfd.FieldDimension = &internal.FD{}
+		mfd.FieldDimension.F = fds
+
+		i = 0
+		ds := make([]string, len(v.D))
+		for k3, _ := range v.D {
+			ds[i] = k3
+			i++
+		}
+		mfd.FieldDimension.D = ds
+		mfds = append(mfds, &mfd)
+	}
+	pb.Mapping = mfds
+
+	if r.Err != nil {
+		pb.Err = proto.String(r.Err.Error())
+	}
+
+	return proto.Marshal(&pb)
+}
+
+func (r *FieldTypeResponse) UnmarshalBinary(data []byte) error {
+	var pb internal.FieldTypeResponse
+	if err := proto.Unmarshal(data, &pb); err != nil {
+		return err
+	}
+
+	r.Mapping = make(map[influxql.Measurement]fd, len(pb.GetMapping()))
+	for _, mfd := range pb.GetMapping() {
+		var fd_map fd
+		fd_map.F = make(map[string]influxql.DataType, len(mfd.GetFieldDimension().GetF()))
+		for _, unit := range mfd.GetFieldDimension().GetF() {
+			fd_map.F[unit.GetField()] = influxql.DataType(unit.GetDataType())
+		}
+
+		fd_map.D = make(map[string]struct{}, len(mfd.GetFieldDimension().GetD()))
+		for _, d := range mfd.GetFieldDimension().GetD() {
+			fd_map.D[d] = struct{}{}
+		}
+
+		var pb_mm internal.Measurement
+		if err := proto.Unmarshal(mfd.Measurement, &pb_mm); err != nil {
+			return nil
+		}
+
+		if mm, err := DecodeMeasurement(&pb_mm); err != nil {
+			return nil
+		} else {
+			r.Mapping[*mm] = fd_map
+		}
+	}
+
+	if pb.Err != nil {
+		r.Err = errors.New(pb.GetErr())
+	}
+
+	return nil
+}
+
+/*
+// MarshalBinary encodes r to a binary format.
+func (r *FieldTypeResponse) MarshalBinary() ([]byte, error) {
+	var pb internal.FieldDimensionsResponse
+
+	//pb.Fields = make([]string, 0, len(r.Fields))
+	//for k := range r.Fields {
+	//	pb.Fields = append(pb.Fields, k)
+	//}
+
+	//pb.Dimensions = make([]string, 0, len(r.Dimensions))
+	//for k := range r.Dimensions {
+	//	pb.Dimensions = append(pb.Dimensions, k)
+	//}
+
+	//if r.Err != nil {
+	//	pb.Err = proto.String(r.Err.Error())
+	//}
+	return proto.Marshal(&pb)
+}
+
+// UnmarshalBinary decodes data into r.
+func (r *FieldTypeResponse) UnmarshalBinary(data []byte) error {
+	//var pb internal.FieldDimensionsResponse
+	//if err := proto.Unmarshal(data, &pb); err != nil {
+	//	return err
+	//}
+
+	//r.Fields = make(map[string]struct{}, len(pb.GetFields()))
+	//for _, s := range pb.GetFields() {
+	//	r.Fields[s] = struct{}{}
+	//}
+
+	//r.Dimensions = make(map[string]struct{}, len(pb.GetDimensions()))
+	//for _, s := range pb.GetDimensions() {
+	//	r.Dimensions[s] = struct{}{}
+	//}
+
+	//if pb.Err != nil {
+	//	r.Err = errors.New(pb.GetErr())
+	//}
+	return nil
+}
+*/
+///////////////////////////////////////////
+
+// SeriesKeysRequest represents a request to retrieve a list of series keys.
+type SeriesKeysRequest struct {
+	ShardIDs []uint64
+	Opt      query.IteratorOptions
+}
+
+// MarshalBinary encodes r to a binary format.
+func (r *SeriesKeysRequest) MarshalBinary() ([]byte, error) {
+	buf, err := r.Opt.MarshalBinary()
+	if err != nil {
+		return nil, err
+	}
+	return proto.Marshal(&internal.SeriesKeysRequest{
+		ShardIDs: r.ShardIDs,
+		Opt:      buf,
+	})
+}
+
+// UnmarshalBinary decodes data into r.
+func (r *SeriesKeysRequest) UnmarshalBinary(data []byte) error {
+	var pb internal.SeriesKeysRequest
+	if err := proto.Unmarshal(data, &pb); err != nil {
+		return err
+	}
+
+	r.ShardIDs = pb.GetShardIDs()
+	if err := r.Opt.UnmarshalBinary(pb.GetOpt()); err != nil {
+		return err
+	}
+	return nil
+}
+
+// SeriesKeysResponse represents a response from retrieving series keys.
+type SeriesKeysResponse struct {
+	//	SeriesList influxql.SeriesList
+	Err error
+}
+
+// MarshalBinary encodes r to a binary format.
+func (r *SeriesKeysResponse) MarshalBinary() ([]byte, error) {
+	var pb internal.SeriesKeysResponse
+	/*
+		buf, err := r.SeriesList.MarshalBinary()
+		if err != nil {
+			return nil, err
+		}
+		pb.SeriesList = buf
+
+		if r.Err != nil {
+			pb.Err = proto.String(r.Err.Error())
+		}
+	*/
+	return proto.Marshal(&pb)
+}
+
+// UnmarshalBinary decodes data into r.
+func (r *SeriesKeysResponse) UnmarshalBinary(data []byte) error {
+	//var pb internal.SeriesKeysResponse
+	/*
+		if err := proto.Unmarshal(data, &pb); err != nil {
+			return err
+		}
+
+		if err := r.SeriesList.UnmarshalBinary(pb.GetSeriesList()); err != nil {
+			return err
+		}
+
+		if pb.Err != nil {
+			r.Err = errors.New(pb.GetErr())
+		}
+	*/
+	return nil
+}
+
+// ExecuteStatementRequest represents the a request to execute a statement on a node.
+type ExecuteStatement1Request struct {
+	pb internal.ExecuteStatement1Request
+}
+
+// Statement returns the InfluxQL statement.
+func (r *ExecuteStatement1Request) Statement() string { return r.pb.GetStatement() }
+
+// SetStatement sets the InfluxQL statement.
+func (r *ExecuteStatement1Request) SetStatement(statement string) {
+	r.pb.Statement = proto.String(statement)
+}
+
+// Statement returns the InfluxQL statement.
+func (r *ExecuteStatement1Request) ShardIDs() []uint64 { return r.pb.GetShardIDs() }
+
+// SetStatement sets the InfluxQL statement.
+func (r *ExecuteStatement1Request) SetShardIDs(shardIDs []uint64) {
+	r.pb.ShardIDs = shardIDs
+}
+
+func (r *ExecuteStatement1Request) MarshalBinary() ([]byte, error) {
+	return proto.Marshal(&r.pb)
+}
+
+// UnmarshalBinary populates ExecuteStatementRequest from a binary format.
+func (r *ExecuteStatement1Request) UnmarshalBinary(buf []byte) error {
+	if err := proto.Unmarshal(buf, &r.pb); err != nil {
+		return err
+	}
+	return nil
+}
+
+// ExecuteStatementResponse represents the response returned from a remote ExecuteStatementRequest call.
+type ExecuteStatement1Response struct {
+	pb internal.ExecuteStatement1Response
+}
+
+// MarshalBinary encodes the object to a binary format.
+func (w *ExecuteStatement1Response) Measurements() []*internal.MTV { return w.pb.GetMeasurements() }
+
+func (w *ExecuteStatement1Response) SetMeasurements(measurements []*internal.MTV) {
+	w.pb.Measurements = measurements
+}
+
+func (w *ExecuteStatement1Response) Err() error { return errors.New(w.pb.GetErr()) }
+
+func (w *ExecuteStatement1Response) SetErr(err error) {
+	w.pb.Err = proto.String(err.Error())
+}
+
+func (w *ExecuteStatement1Response) MarshalBinary() ([]byte, error) {
+	return proto.Marshal(&w.pb)
+}
+
+// UnmarshalBinary populates ExecuteStatementResponse from a binary format.
+func (w *ExecuteStatement1Response) UnmarshalBinary(buf []byte) error {
+	if err := proto.Unmarshal(buf, &w.pb); err != nil {
+		return err
+	}
+	return nil
+}
+
+func EncodeMeasurement(mm *influxql.Measurement) *internal.Measurement {
+	pb := &internal.Measurement{
+		Database:        proto.String(mm.Database),
+		RetentionPolicy: proto.String(mm.RetentionPolicy),
+		Name:            proto.String(mm.Name),
+		SystemIterator:  proto.String(mm.SystemIterator),
+		IsTarget:        proto.Bool(mm.IsTarget),
+	}
+	if mm.Regex != nil {
+		pb.Regex = proto.String(mm.Regex.Val.String())
+	}
+	return pb
+}
+
+func DecodeMeasurement(pb *internal.Measurement) (*influxql.Measurement, error) {
+	mm := &influxql.Measurement{
+		Database:        pb.GetDatabase(),
+		RetentionPolicy: pb.GetRetentionPolicy(),
+		Name:            pb.GetName(),
+		SystemIterator:  pb.GetSystemIterator(),
+		IsTarget:        pb.GetIsTarget(),
+	}
+
+	if pb.Regex != nil {
+		regex, err := regexp.Compile(pb.GetRegex())
+		if err != nil {
+			return nil, fmt.Errorf("invalid binary measurement regex: value=%q, err=%s", pb.GetRegex(), err)
+		}
+		mm.Regex = &influxql.RegexLiteral{Val: regex}
+	}
+
+	return mm, nil
+}
+
+//just used for test Rpc message marshal and unmarshal
+func TestRpc() {
+	fmt.Println("rpc_test start")
+	var fdr FieldDimensionsResponse
+	var ftr FieldTypeRequest
+	var ftr_rep FieldTypeResponse
+
+	var fdc fd
+	var Ids []uint64
+
+	Ids = make([]uint64, 0, 2)
+	Ids = append(Ids, 31)
+	Ids = append(Ids, 32)
+
+	imm := internal.Measurement{
+		Database:        proto.String("database"),
+		RetentionPolicy: proto.String("rp"),
+		Name:            proto.String("name"),
+	}
+
+	mm, err := DecodeMeasurement(&imm)
+	if err != nil {
+		fmt.Println("internal Decode error")
+	}
+
+	fdc.F = make(map[string]influxql.DataType, 2)
+	fdc.D = make(map[string]struct{}, 1)
+
+	fdc.F["mm1"] = influxql.DataType(15)
+	fdc.F["mm2"] = influxql.DataType(16)
+	fdc.D["dd1"] = struct{}{}
+
+	fdr.Mapping = make(map[influxql.Measurement]fd, 1)
+	fdr.Mapping[*mm] = fdc
+	fdr.Err = fmt.Errorf("%s", "the error test for rpc")
+
+	ftr.Mapping = make(map[influxql.Measurement]fd, 1)
+	ftr.Mapping[*mm] = fdc
+	ftr.ShardIDs = Ids
+
+	ftr_rep.Mapping = make(map[influxql.Measurement]fd, 1)
+	ftr_rep.Mapping[*mm] = fdc
+	ftr_rep.Err = fmt.Errorf("%s", "the error test for rpc")
+
+	tmp_byte, err2 := fdr.MarshalBinary()
+	tmp_byte2, err3 := ftr.MarshalBinary()
+	tmp_byte3, err4 := ftr_rep.MarshalBinary()
+
+	if err2 != nil {
+		fmt.Println("FieldDimensionResponse marshalbinary error")
+	}
+
+	if err3 != nil {
+		fmt.Println("FieldTypeRequest marshalbinary error")
+	}
+
+	if err4 != nil {
+		fmt.Println("FieldTypeResponse marshalbinary error")
+	}
+
+	//fmt.Println(string(tmp_byte))
+
+	fmt.Println("start to marshalbinary")
+
+	fdr_p := &FieldDimensionsResponse{}
+	if err3 := fdr_p.UnmarshalBinary(tmp_byte); err3 != nil {
+		fmt.Println("FieldDimensionResponse unmarshalbinary error")
+	}
+	fmt.Println("fdr~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+	fmt.Println("%d", int32(fdr_p.Mapping[*mm].F["mm1"]))
+	fmt.Println("%d", int32(fdr_p.Mapping[*mm].F["mm2"]))
+	fmt.Println("fdr Err: %v", fdr_p.Err)
+
+	ftr_p := &FieldTypeRequest{}
+	if err3 := ftr_p.UnmarshalBinary(tmp_byte2); err3 != nil {
+		fmt.Println("FieldTypeRequest unmarshalbinary error")
+	}
+	fmt.Println("ftr_req~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+	fmt.Println("%d", int32(ftr_p.Mapping[*mm].F["mm1"]))
+	fmt.Println("%d", int32(ftr_p.Mapping[*mm].F["mm2"]))
+	for _, v := range ftr_p.ShardIDs {
+		fmt.Println("%d", v)
+	}
+
+	ftr_rep_p := &FieldTypeResponse{}
+	if err3 := ftr_rep_p.UnmarshalBinary(tmp_byte3); err3 != nil {
+		fmt.Println("FieldTypeResponse unmarshalbinary error")
+	}
+	fmt.Println("ftr_rep~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+	fmt.Println("%d", int32(ftr_rep_p.Mapping[*mm].F["mm1"]))
+	fmt.Println("%d", int32(ftr_rep_p.Mapping[*mm].F["mm2"]))
+	fmt.Println("ftr_rep Err: %v", ftr_rep_p.Err)
+
+	fmt.Println("unmarsh ok")
+
+	fmt.Println("rpc_test stop")
+}

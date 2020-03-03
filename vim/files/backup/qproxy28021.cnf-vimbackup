@@ -1,0 +1,34 @@
+ reporting-disabled = true
+ bind-address = "10.208.37.11:13021"
+[cluster]
+  enable-proxy = true
+  meta-servers = ["10.208.39.56:18021","10.208.61.81:18021","10.208.61.82:18021"] #meta地址
+  shard-writer-timeout = "5s"
+  read-timeout = "1000s"
+  write-timeout = "10s"
+  max-remote-write-connections = 30000
+  slowlog-log-slower-than =0 #慢查询触发
+  log-slow = true  #是否开启慢查询
+  meta-auth-enabled=true  # meta验证
+  meta-user-name = "cluster_admin"
+  meta-password = "34e31dc71ff25bc9"
+[hinted-handoff]
+  enabled = true
+  dir = "/home/lw/works/qtsdb_new/qtsdb/data-proxy-server/bin/qproxy28021/hh"
+  max-size = 10737418240
+  max-age = "168h"
+  retry-rate-limit = 0
+  retry-interval = "1s"
+  retry-max-interval = "1m"
+  purge-interval = "1h"
+[http]
+   bind-address = "10.208.37.11:28021"
+   auth-enabled = true
+   max-connection-limit = 2000
+   backup-dir = "/data1/qproxy28021/backup" # 通过proxy备份集群存储位置
+[logging]
+  filename = "/home/lw/works/qtsdb_new/qtsdb/data-proxy-server/bin/qproxy28021/logs/influx-proxy.log"
+  maxsize = 500
+  maxage = 7
+  maxbackups = 5
+  query_filename = "/home/lw/works/qtsdb_new/qtsdb/data-proxy-server/bin/qproxy28021/logs/slow.log"

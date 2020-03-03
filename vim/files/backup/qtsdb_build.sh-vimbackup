@@ -1,0 +1,41 @@
+#!/bin/bash
+
+GetGitBranch() {
+ branch=`git rev-parse --abbrev-ref HEAD`
+ echo $branch
+}
+
+GetGitCommit() {
+  commit=`git log --pretty=format:'%h' -n 1`
+  echo $commit
+}
+
+GetInfluxdbVersion() {
+  version=`cat ../../../../../deploy/VERSION`
+  echo $version
+}
+
+build() {
+  branch=`GetGitBranch`
+  commit=`GetGitCommit`
+  version=`GetInfluxdbVersion`
+
+  echo "current version:"$version" | git branch:"$branch" | git commit:"$commit
+  echo "start build ..."
+  # debug build
+  go install    -gcflags=all="-N -l"    -ldflags="-X main.version=$version -X main.branch=$branch -X main.commit=$commit" ./...
+  # release build
+  #go install -ldflags="-X main.version=$version -X main.branch=$branch -X main.commit=$commit" ./...
+}
+
+echo "Please update version file[../../../../../deploy/VERSION] first"
+echo "If updated, enter Y to continue"
+echo "Otherwise, enter N to exit."
+
+read -p "Please entry Y/N:" yorn
+
+case "$yorn" in
+  Y|y)
+    build
+    ;;
+esac

@@ -1,0 +1,289 @@
+package com.mytest;
+
+import java.util.Enumeration;
+
+import org.apache.bookkeeper.client.BookKeeper;
+import org.apache.bookkeeper.client.LedgerHandle;
+import org.apache.bookkeeper.client.LedgerEntry;
+import org.apache.bookkeeper.client.api.LastConfirmedAndEntry;
+import org.apache.bookkeeper.conf.ClientConfiguration;
+//import org.apache.bookkeeper.client.api.LedgerEntry;
+import org.apache.bookkeeper.client.impl.LedgerEntryImpl;
+
+/**
+ * Hello world!
+ *
+ */
+public class App {
+  static String connectionString = "10.209.242.147:2181";
+
+  public static void CreateLedgerByClientApi() {
+    try {
+      ClientConfiguration confWithNoExplicitLAC = new ClientConfiguration();
+      confWithNoExplicitLAC.setZkServers(connectionString);
+
+      BookKeeper bkClient = BookKeeper.forConfig(confWithNoExplicitLAC).build();
+
+      System.out.println("11111");
+      byte[] password = "some-password".getBytes();
+      //LedgerHandle handle = bkClient.createLedger(BookKeeper.DigestType.MAC, password);
+      org.apache.bookkeeper.client.api.WriteHandle handle = bkClient.newCreateLedgerOp()
+        .withEnsembleSize(1)
+        .withWriteQuorumSize(1)
+        .withAckQuorumSize(1)
+        .withDigestType(org.apache.bookkeeper.client.api.DigestType.CRC32C)
+        .withPassword(password)
+        .execute()
+        .get();
+        long entryId = handle.append("Some entry data".getBytes());
+      System.out.println("33333");
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+  public static void CreateLedger() {
+    BookKeeper bkClient = null;
+    LedgerHandle handle = null;
+
+      System.out.println("0000");
+    try {
+      //ClientConfiguration confWithNoExplicitLAC = new ClientConfiguration();
+      //confWithNoExplicitLAC.setMetadataServiceUri("zk+hierarchical://10.209.242.147:2181;10.209.240.36:2181;10.209.35.107:2181/ledgers");
+      //confWithNoExplicitLAC.setLedgerManagerType("hierarchical");
+      //confWithNoExplicitLAC.setZkServers(connectionString);
+      //confWithNoExplicitLAC.setZkLedgersRootPath("/ledgers");
+      //confWithNoExplicitLAC.setExplictLacInterval(2);
+
+      //bkClient = new BookKeeper(confWithNoExplicitLAC);
+      bkClient = new BookKeeper(connectionString);
+
+      System.out.println("11111");
+      byte[] password = "some-password".getBytes();
+      handle = bkClient.createLedger(BookKeeper.DigestType.MAC, password);
+      System.out.println("33333");
+
+      long entryId = handle.addEntry("Some entry data".getBytes());
+      long entryId1 = handle.addEntry("111Some entry data".getBytes());
+      long entryId2 = handle.addEntry("222Some entry data".getBytes());
+
+      System.out.println("2222");
+      long lac = handle.readLastConfirmed();
+      System.out.println("xxxx | get lac:" + lac + " | lac: " + handle.getLastAddConfirmed());
+      Enumeration<LedgerEntry> entries = handle.readEntries(0, handle.getLastAddConfirmed());
+      while (entries.hasMoreElements()) {
+        LedgerEntry entry = entries.nextElement();
+        String s = new String(entry.getEntry());
+        System.out.println("Successfully read entry: " + s);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      try {
+        //handle.close();
+        bkClient.close();
+      } catch (Exception e) {
+      }
+    }
+  }
+
+  public static void ReadLedgerByLedgerId(long ledgerId) {
+    BookKeeper bkClient = null;
+    LedgerHandle handle = null;
+
+    try {
+      bkClient = new BookKeeper(connectionString);
+
+      byte[] password = "some-password".getBytes();
+      handle = bkClient.openLedgerNoRecovery(ledgerId,
+          BookKeeper.DigestType.MAC,
+          password);
+
+      long lac = handle.readLastConfirmed();
+      System.out.println("xxxx | get lac:" + lac + " | lac: " + handle.getLastAddConfirmed());
+
+      Enumeration<LedgerEntry> entries = handle.readEntries(0, lac);
+      while (entries.hasMoreElements()) {
+        LedgerEntry entry = entries.nextElement();
+        String s = new String(entry.getEntry());
+        System.out.println("Successfully read entry: " + s);
+      }
+
+      /*
+      LedgerEntry entry = handle.readLastEntry();
+      String s = new String(entry.getEntry());
+      System.out.println("Successfully read entry: " + s);
+      */
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      try {
+        //handle.close();
+        bkClient.close();
+      } catch (Exception e) {
+      }
+    }
+  }
+
+  public static class WriteThread extends Thread {
+    public void run() {
+      BookKeeper bkClient = null;
+      LedgerHandle handle = null;
+
+      try {
+        ClientConfiguration confWithNoExplicitLAC = new ClientConfiguration();
+        confWithNoExplicitLAC.setZkServers(connectionString);
+        confWithNoExplicitLAC.setZkLedgersRootPath("/ledgers");
+        //confWithNoExplicitLAC.setMetadataServiceUri(connectionString);
+        confWithNoExplicitLAC.setExplictLacInterval(10000);
+
+        bkClient = new BookKeeper(confWithNoExplicitLAC);
+
+        byte[] password = "some-password".getBytes();
+        handle = bkClient.createLedger(BookKeeper.DigestType.MAC, password);
+
+        for (int i = 0; i < 10; i++) {
+          System.out.println("ok write entry: " + i);
+          handle.addEntry(Integer.toString(i).getBytes());
+          Thread.sleep(1000);
+        }
+
+        Thread.sleep(10000);
+      } catch (Exception e) {
+        e.printStackTrace();
+      } finally {
+        try {
+          //handle.close();
+          bkClient.close();
+        } catch (Exception e) {
+        }
+      }
+    }
+  }
+
+  public static class ReadThread extends Thread {
+    public void run() {
+      BookKeeper bkClient = null;
+      LedgerHandle handle = null;
+      try {
+        Thread.sleep(5000);
+        bkClient = new BookKeeper(connectionString);
+
+        byte[] password = "some-password".getBytes();
+        handle = bkClient.openLedgerNoRecovery(32,
+            BookKeeper.DigestType.MAC,
+            password);
+
+        /*
+        long lac = -1;
+        while (true) {
+          long currentLac = handle.readLastConfirmed();
+          //long currentLac = handle.getLastAddConfirmed();
+            System.out.println("xxxx | get lac:" + lac + " | lac: " + currentLac);
+          if (currentLac > lac) {
+
+            Enumeration<LedgerEntry> entries = handle.readEntries(lac + 1, currentLac);
+            while (entries.hasMoreElements()) {
+              LedgerEntry entry = entries.nextElement();
+              String s = new String(entry.getEntry());
+              System.out.println("Successfully read entry: " + s);
+            }
+
+            lac = currentLac;
+          } else {
+            Thread.sleep(200);
+          }
+        }
+        */
+        long startEntryId = 0L;
+        long nextEntryId = startEntryId;
+        int numEntriesPerBatch = 4;
+        while (!handle.isClosed() || nextEntryId <= handle.getLastAddConfirmed()) {
+          long lac = handle.getLastAddConfirmed();
+          if (nextEntryId > lac) {
+            // no more entries are added
+            LastConfirmedAndEntry lacAndEntry = handle.readLastAddConfirmedAndEntry(nextEntryId, 1000, false);
+              if (lacAndEntry.hasEntry()) {
+                String s = new String(lacAndEntry.getEntry().getEntryBytes());
+                System.out.println("Successfully read entry: " + s);
+                ++nextEntryId;
+              }
+                System.out.println("Successfully long polling");
+          } else {
+            long endEntryId = Math.min(lac, nextEntryId + numEntriesPerBatch - 1);
+            Enumeration<LedgerEntry> entries = handle.readEntries(nextEntryId, endEntryId);
+            while (entries.hasMoreElements()) {
+              LedgerEntry entry = entries.nextElement();
+              String s = new String(entry.getEntry());
+              System.out.println("Successfully read entry: " + s);
+            }
+            // process the entries
+            nextEntryId = endEntryId + 1;
+          }
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+      } finally {
+        try {
+          handle.close();
+          bkClient.close();
+        } catch (Exception e) {
+        }
+      }
+    }
+  }
+
+  public static void TestBookieCrashWhenWrite() {
+      BookKeeper bkClient = null;
+      LedgerHandle handle = null;
+      try {
+        ClientConfiguration confWithNoExplicitLAC = new ClientConfiguration();
+        confWithNoExplicitLAC.setZkServers(connectionString);
+        confWithNoExplicitLAC.setZkLedgersRootPath("/ledgers");
+        confWithNoExplicitLAC.setExplictLacInterval(1000);
+
+        bkClient = new BookKeeper(confWithNoExplicitLAC);
+
+        byte[] password = "some-password".getBytes();
+        handle = bkClient.createLedger(BookKeeper.DigestType.MAC, password);
+
+        for (int i = 0; i < 1000; i++) {
+          System.out.println("ok write entry: " + i);
+          handle.addEntry(Integer.toString(i).getBytes());
+          Thread.sleep(1000);
+        }
+
+        Thread.sleep(10000);
+      } catch (Exception e) {
+        e.printStackTrace();
+      } finally {
+        try {
+          //handle.close();
+          bkClient.close();
+        } catch (Exception e) {
+        }
+      }
+  }
+
+  public static void ReadWriteByMultiThread() {
+    WriteThread wt = new WriteThread(); 
+    ReadThread rt = new ReadThread(); 
+
+    wt.start();
+    rt.start();
+
+    try {
+      wt.join();
+      rt.join();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  public static void main(String[] args) {
+    CreateLedgerByClientApi();
+    //CreateLedger();
+    //ReadLedgerByLedgerId(32);
+    //ReadWriteByMultiThread();
+    //TestBookieCrashWhenWrite();
+  }
+}

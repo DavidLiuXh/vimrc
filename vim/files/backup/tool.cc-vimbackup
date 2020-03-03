@@ -1,0 +1,6 @@
+#include <string>
+#include <iostream>
+
+inline void showMsg() {
+  std::cout << "sssss" << std::endl;
+}

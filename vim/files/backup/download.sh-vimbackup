@@ -1,0 +1,7 @@
+#!/bin/bash
+
+cat ./1 | while read line   #filename 为需要读取的文件名,也可以放在命令行参数里。
+do
+  go get "$line"
+  #echo $line
+done

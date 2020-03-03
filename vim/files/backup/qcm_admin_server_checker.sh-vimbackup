@@ -1,0 +1,6 @@
+#!/bin/sh
+
+mypidcount=`ps aux | grep qcm_admin_server | grep supervise | grep -v grep | awk '{print $2}' | wc -l`
+if [ "$mypidcount" = "0" ]; then
+       nohup /usr/local/bin/supervise /home/infra/qcm_admin_server
+fi

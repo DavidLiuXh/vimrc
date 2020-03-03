@@ -1,0 +1,34 @@
+package models
+
+const (
+	OK = iota
+	KEY_OR_VALUE_IS_NULL
+	CONFIG_EXISTS
+	FAILED_TO_PARSE_REQUEST
+	INTERNAL_ERROR_ETCD
+	CONFIG_NOT_EXISTS
+	MARSHAL_JSON_FAILED
+	INTERNAL_ERROR_REDIS
+	DEFAULT_ERROR
+	KEY_IS_INVALID
+	ROLLBACK_FAILED_GET_HISTORY_REVERSION
+)
+
+var ERROR_MSG = map[int]string{
+	OK:                                    "ok",
+	KEY_OR_VALUE_IS_NULL:                  "some parameters are empty",
+	CONFIG_EXISTS:                         "config already exists",
+	INTERNAL_ERROR_ETCD:                   "internal error for etcd client",
+	FAILED_TO_PARSE_REQUEST:               "failed to parse request",
+	CONFIG_NOT_EXISTS:                     "config is not exists",
+	INTERNAL_ERROR_REDIS:                  "internal error for redis client",
+	MARSHAL_JSON_FAILED:                   "failed to marshal etcd data",
+	DEFAULT_ERROR:                         "failed to parse json parameter",
+	KEY_IS_INVALID:                        "key is invalid",
+	ROLLBACK_FAILED_GET_HISTORY_REVERSION: "rollback failed to get history reversion",
+}
+
+func makeErrorMsg(errorCode int, err error) (msg string) {
+	msg = ERROR_MSG[errorCode] + ":" + err.Error()
+	return msg
+}

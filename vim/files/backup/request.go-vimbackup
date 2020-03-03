@@ -1,0 +1,136 @@
+package models
+
+type EtcdSaveData struct {
+	ConfigValue   string `json:"config_value"`
+	ConfigType    string `json:"config_type"`
+	ConfigUser    string `json:"config_operator"`
+	ConfigModTime int64  `json:"config_timestamp"`
+}
+
+type DefaultConfigResponse struct {
+	ErrorCode int    `json:"err_code"`
+	ErrorMsg  string `json:"err_msg"`
+}
+
+type CreateConfigRequest struct {
+	ConfigKey   string `json:"config_key"`
+	ConfigValue string `json:"config_value"`
+	ConfigType  string `json:"config_type"`
+	ConfigUser  string `json:"config_operator"`
+}
+
+type CreateConfigReresponse struct {
+	ErrorCode       int    `json:"err_code"`
+	ErrorMsg        string `json:"err_msg"`
+	UserKey         string `json:"user_key"`
+	ConfigReversion int64  `json:"config_reversion"`
+}
+
+type BatchCreateConfigRequest struct {
+	CreateConfigList []CreateConfigRequest `json:"create_config_list"`
+}
+
+type BatchCreateConfigResponse struct {
+	CreateConfigList []CreateConfigReresponse `json:"create_config_list"`
+}
+
+type UpdateConfigRequest struct {
+	CreateConfigRequest
+}
+
+type UpdateConfigResponse struct {
+	ErrorCode       int    `json:"err_code"`
+	ErrorMsg        string `json:"err_msg"`
+	ConfigKey       string `json:"config_key"`
+	ConfigReversion int64  `json:"config_reversion"`
+}
+
+type DeleteConfigRequest struct {
+	ConfigKey string `json:"config_key"`
+}
+
+type BatchDeleteConfigRequest struct {
+	ConfigKeys []DeleteConfigRequest `json:"config_keys"`
+}
+
+type BatchDeleteConfigResponse struct {
+	ConfigKeys []DefaultConfigResponse `json:"config_keys"`
+}
+
+type ListAppRequest struct {
+	ConfigAppKey string `json:"config_key"`
+}
+
+type ListAppResponse struct {
+	ErrorCode    int      `json:"err_code"`
+	ErrorMsg     string   `json:"err_msg"`
+	ConfigAppKey string   `json:"config_key"`
+	AppList      []string `json:"app_list"`
+}
+
+type NsConfigData struct {
+	NameSpace string `json:"namespace"`
+	EtcdSaveData
+	ConfigReversion int64 `json:"config_reversion"`
+}
+
+type GetConfigListByAppResponse struct {
+	ErrorCode    int            `json:"err_code"`
+	ErrorMsg     string         `json:"err_msg"`
+	ConfigAppKey string         `json:"config_key"`
+	ConfigList   []NsConfigData `json:"ns_config_list"`
+}
+
+type ConfigData struct {
+	ConfigValue     string `json:"config_value"`
+	ConfigType      string `json:"config_type"`
+	ConfigUser      string `json:"config_operator"`
+	ConfigModTime   int64  `json:"config_timestamp"`
+	ConfigReversion int64  `json:"config_reversion"`
+}
+
+type GetConfigResponse struct {
+	ErrorCode    int        `json:"err_code"`
+	ErrorMsg     string     `json:"err_msg"`
+	ConfigAppKey string     `json:"config_key"`
+	Config       ConfigData `json:"config"`
+}
+
+type GetHistoryListResponse struct {
+	ErrorCode    int          `json:"err_code"`
+	ErrorMsg     string       `json:"err_msg"`
+	ConfigAppKey string       `json:"config_key"`
+	ConfigList   []ConfigData `json:"history_list"`
+}
+
+type RollbackConfigRequest struct {
+	ConfigKey       string `json:"config_key"`
+	ConfigValue     string `json:"config_value"`
+	ConfigType      string `json:"config_type"`
+	ConfigUser      string `json:"config_operator"`
+	ConfigReversion int64  `json:"config_reversion"`
+}
+
+type GetSyncStatusRequest struct {
+	ConfigKey       string `json:"config_key"`
+	ConfigReversion int64  `json:"config_reversion"`
+}
+
+type SyncData struct {
+	IpPort    string `json:"ip_port"`
+	Reversion int64  `json:"config_reversion"`
+	Timestamp int64  `json:"timestamp"`
+}
+
+type GetSyncStatusResponse struct {
+	ErrorCode int        `json:"err_code"`
+	ErrorMsg  string     `json:"err_msg"`
+	ConfigKey string     `json:"config_key"`
+	SyncList  []SyncData `json:"sync_list"`
+}
+
+type GetSubBusinessListResponse struct {
+	ErrorCode   int      `json:"err_code"`
+	ErrorMsg    string   `json:"err_msg"`
+	SubBusiness []string `json:"subbusiness_list"`
+}

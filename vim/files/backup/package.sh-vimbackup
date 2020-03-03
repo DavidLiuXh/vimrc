@@ -1,0 +1,49 @@
+#!/bin/bash
+
+META_DIR=../meta-server
+DATA_DIR=../data-proxy-server
+PROXY_DIR=../data-proxy-server
+
+if [ "" = "$1" ]; then
+	echo "Please specify VERSION number"
+	exit -1;
+fi
+
+rm influxdb -rf
+
+mkdir influxdb
+
+mkdir influxdb/influx-meta
+cp ${META_DIR}/bin/influxd    influxdb/influx-meta/influxd-meta
+cp ${META_DIR}/conf/meta.conf influxdb/influx-meta
+cp meta-run                   influxdb/influx-meta/run
+cp influxd-meta-check.sh      influxdb/influx-meta
+
+mkdir influxdb/influx-meta_admin
+cp ${DATA_DIR}/bin/meta_admin influxdb/influx-meta_admin
+
+mkdir influxdb/influx-data
+cp ${DATA_DIR}/bin/influxd    influxdb/influx-data/influxd-data
+cp ${DATA_DIR}/conf/data.conf influxdb/influx-data
+cp data-run                   influxdb/influx-data/run
+cp influxd-data-check.sh      influxdb/influx-data
+
+mkdir influxdb/influx-proxy
+cp ${PROXY_DIR}/bin/influxd     influxdb/influx-proxy/influxd-proxy
+cp ${PROXY_DIR}/conf/proxy.conf influxdb/influx-proxy
+cp proxy-run                    influxdb/influx-proxy/run
+cp influxd-proxy-check.sh       influxdb/influx-proxy
+
+echo $1 > influxdb/influx-meta/VERSION
+echo $1 > influxdb/influx-data/VERSION
+echo $1 > influxdb/influx-proxy/VERSION
+
+cd influxdb
+tar zcf influx-meta.tar.gz  influx-meta
+tar zcf influx-data.tar.gz  influx-data
+tar zcf influx-proxy.tar.gz influx-proxy
+tar zcf meta_admin.tar.gz influx-meta_admin
+
+tar zcf influxd-all.tar.gz ./influx-meta.tar.gz ./influx-data.tar.gz ./influx-proxy.tar.gz ./meta_admin.tar.gz
+
+scp influxd-all.tar.gz liuwei3-s@

@@ -1,0 +1,18 @@
+1.0.0版本:
+  1. 配置文件中增加listen.backlog配置,可以设置listen队列长度,满足也高并发需求,原有默认队列长度为50;
+  2. 服务端接收到不支持的协议,且直接close掉该客户端的连接;
+
+1.0.1版本:
+  1. 增加SocketServer.scala中run里面的异常捕获: BufferUnderflowException, NullPointerException
+
+1.0.2版本:
+  1. SocketServer.scala中run里面调用close时不将exception抛到外层
+
+1.0.3版本:
+  1. 彻底防止刷大量"Attempted to decrease connection count for address with no connections, address"日志
+
+1.0.4版本:
+  1. 解决因"kafka.common.KafkaException: number of topics has value -1 which is not in the range"导致的同批次request请求丢失，不能被处理的问题
+
+1.0.5版本:
+  1. 解决因在SocketServer::run中因mute抛出异常所导致的同批次request请求丢失，不能被处理的问题

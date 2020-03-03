@@ -1,0 +1,183 @@
+#include <string>
+#include <iostream>
+#include <memory>
+#include <unistd.h>
+#include <fcntl.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <errno.h>
+#include <glog/logging.h>
+
+#include "option.h"
+#include "util.h"
+#include "config_server.h"
+
+std::unique_ptr<peanuts::ConfigServer> config_server;
+
+static void SignalHandle(int sig) {
+  LOG(WARNING) << "Catch Signal = " << sig << ", stopping server...";
+  config_server->Stop();
+}
+
+static void SignalSetup() {
+  signal(SIGHUP, SIG_IGN);
+  signal(SIGTTOU, SIG_IGN);
+  signal(SIGTTIN, SIG_IGN);
+  signal(SIGPIPE, SIG_IGN);
+
+  signal(SIGINT, SignalHandle);
+  signal(SIGQUIT, SignalHandle);
+  signal(SIGTERM, SignalHandle);
+  signal(SIGTSTP, SignalHandle);
+}
+
+static void InitLog(const char* pname, const peanuts::Option& option) {
+  std::string log_dir;
+  std::string max_log_size_str, min_log_level_str;
+  uint32_t max_log_size = 0, min_log_level = 0;
+  if (option.GetValue("log_dir", &log_dir) == -1) {
+    std::cout << "please specify a log dir" << std::endl;
+    exit(-1);
+  }
+
+  if ((option.GetValue("max_log_size", &max_log_size_str) == -1)
+    || ((max_log_size = peanuts::StrToNum<uint32_t>(max_log_size_str)) == 0)) {
+    std::cout << "will use default max log size" << SERVER_MAX_LOG_SIZE;
+    max_log_size = SERVER_MAX_LOG_SIZE;
+  }
+
+  if (log_dir != "." && log_dir != "./"
+    && log_dir != ".." && log_dir != "../") {
+    if (peanuts::CreateDir(log_dir) == -1) {
+      std::cout << "create log_dir failed, reason: " << strerror(errno);
+      exit(-1);
+    }
+  }
+
+  if ((option.GetValue("min_log_level", &min_log_level_str) == -1)
+    || ((min_log_level = peanuts::StrToNum<uint32_t>(min_log_level_str)) > 4)) {
+    std::cout << "will use default min_log_level" << 0;
+    min_log_level = 0;
+  }
+
+  FLAGS_log_dir = log_dir;
+  FLAGS_minloglevel = min_log_level;
+  FLAGS_max_log_size = max_log_size;
+  FLAGS_stop_logging_if_full_disk = true;
+  FLAGS_alsologtostderr = false;
+  google::InitGoogleLogging(pname);
+}
+
+static void InitServer(const peanuts::Option& option) {
+  config_server = std::unique_ptr<peanuts::ConfigServer>(new peanuts::ConfigServer(option));
+
+  if (config_server->Init() == -1) {
+    LOG(ERROR) << "server init failed";
+  } else {
+    DLOG(INFO) << "server init ok";
+    config_server->Start();
+  }
+}
+
+static void daemonize() {
+  pid_t pid;
+  umask(0);
+
+  if ((pid = fork()) < 0) {
+    LOG(FATAL) << "fork error: " << strerror(errno);
+  } else if (pid != 0) {
+    exit(0);
+  }
+
+  if (setsid() == -1) {
+    LOG(FATAL) << "setsid error: " << strerror(errno);
+  }
+
+  SignalSetup();
+
+  if ((pid = fork()) < 0) {
+    LOG(FATAL) << "fork error: " << strerror(errno);
+  } else if (pid != 0) {
+    exit(0);
+  }
+
+  for (int i = 0; i < NOFILE; i++) {
+    //if (i == 2) {
+    close(i);
+    //LOG(ERROR) << i << " : " << strerror(errno);
+    //  break;
+  //  }
+  }
+
+  int fd0, fd1, fd2;
+  fd0 = open("/dev/null", O_RDWR);
+  fd1 = dup(0);
+  fd2 = dup(0);
+}
+
+void usage(const std::string& pname) {
+  std::cout << "Usage: \n"
+    << pname << " \n"
+    << "[-d] -- is_daemonize(default true) \n"
+    << "-h -- show help \n"
+    << "-c file -- config file \n";
+}
+
+int main(int argc, char* argv[]) {
+  if (argc <= 2 || argc > 4) {
+    usage(argv[0]);
+    return 0;
+  }
+
+  std::string conf_file;
+  bool is_daemonize = true;
+
+  if (argc == 3) {
+    std::string item;
+    item.append(argv[1]);
+    if (item == "-c") {
+      conf_file.append(argv[2]);
+    } else {
+      usage(argv[0]);
+      return 0;
+    }
+  }
+
+  if (argc == 4) {
+    std::string item1;
+    item1.append(argv[1]);
+    if (item1 == "-d") {
+      is_daemonize = false;
+    } else {
+      usage(argv[0]);
+      return 0;
+    }
+
+    std::string item2;
+    item2.append(argv[2]);
+    if (item2 == "-c") {
+      conf_file.append(argv[3]);
+    } else {
+      usage(argv[0]);
+      return 0;
+    }
+  }
+
+  peanuts::Option option;
+  option.SetValue("server_name", argv[0]);
+  if (option.LoadFile(conf_file) == -1) {
+    std::cout << "load config file failed" << std::endl;
+    return -1;
+  }
+  if (is_daemonize == true) { 
+    daemonize();
+  }
+  InitLog(argv[0], option);
+  SignalSetup();
+  InitServer(option);
+
+  LOG(INFO) << "server had stoped";
+  config_server.reset();
+  google::ShutdownGoogleLogging();
+}

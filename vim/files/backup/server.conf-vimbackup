@@ -1,0 +1,27 @@
+#server config
+server_ip: 0.0.0.0
+server_port: 9527
+worker_num: 4
+max_revision_interval: 10000
+key_prefix: /
+reconn_interval: 5
+db_name: ./testdb
+address: 10.209.33.175:2379
+request_timeout: 5
+
+log_dir: ./log
+min_log_level: 1
+max_log_size: 1024
+log_clean_days: 1
+
+#redis env
+redis_ip: 10.16.15.56
+redis_port: 6379
+redis_pwd: 123456
+
+#http config
+#1:enable 0:disable
+http_only:1
+http_ip:10.19.100.281
+http_port:8090
+http_work_thread_size:4

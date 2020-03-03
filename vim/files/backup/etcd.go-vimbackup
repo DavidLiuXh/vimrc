@@ -1,0 +1,771 @@
+package models
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"github.com/astaxie/beego"
+	"github.com/deckarep/golang-set"
+	"go.etcd.io/etcd/clientv3"
+	"runtime"
+	"strconv"
+	"strings"
+	"time"
+)
+
+var (
+	etcdObject EtcdObject
+)
+
+type EtcdObject struct {
+	etcdClient         *clientv3.Client
+	uri                []string
+	timeout            int64
+	retainHistoryCount int
+}
+
+const (
+	REVERSION_KEY_POSTFIX = "_REVERSION"
+)
+
+func etcdReconnect(err error) {
+	pc, _, _, _ := runtime.Caller(1)
+	f := runtime.FuncForPC(pc)
+	beego.Error("", f.Name(), " | failed to operate etcdClient | error msg: ", err)
+}
+
+//TODO:use tx
+func updateConfigReversion(key string, reversion int64, oldReversion int64) (rtErr error) {
+	rtErr = nil
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(etcdObject.timeout)*time.Second)
+	getResponse, err := etcdObject.etcdClient.Get(ctx, key+REVERSION_KEY_POSTFIX)
+	cancel()
+	if err != nil {
+		etcdReconnect(err)
+		rtErr = err
+	} else {
+		beego.Debug("get response: ", getResponse)
+		data := ""
+		if 0 == getResponse.Count {
+			data = strconv.FormatInt(reversion, 10)
+		} else {
+			data = string(getResponse.Kvs[0].Value)
+			dataSlice := strings.Split(data, ",")
+
+			if oldReversion >= 0 {
+				for i, v := range dataSlice {
+					if strconv.FormatInt(oldReversion, 10) == v {
+						dataSlice = append(dataSlice[:i], dataSlice[i+1:]...)
+						break
+					}
+				}
+			}
+			if len(dataSlice) >= etcdObject.retainHistoryCount {
+				dataSlice = dataSlice[1:]
+				data = strings.Join(dataSlice, ",")
+			} else {
+				data = strings.Join(dataSlice, ",")
+			}
+
+			data = data + "," + strconv.FormatInt(reversion, 10)
+		}
+
+		beego.Debug("updateConfigReversion | data: ", data, " | odl reversion: ", oldReversion)
+
+		ctx, cancel = context.WithTimeout(context.Background(), time.Duration(etcdObject.timeout)*time.Second)
+		_, err := etcdObject.etcdClient.Put(ctx, key+REVERSION_KEY_POSTFIX, data)
+		if err != nil {
+			etcdReconnect(err)
+			rtErr = err
+		}
+	}
+
+	return rtErr
+}
+
+func isExistConfig(key string, value string, checkValue bool) (rt bool, data string, rtErr error) {
+	rt = false
+	rtErr = nil
+	data = ""
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(etcdObject.timeout)*time.Second)
+	getResponse, err := etcdObject.etcdClient.Get(ctx, key)
+	cancel()
+	if err != nil {
+		rtErr = err
+		etcdReconnect(err)
+	} else {
+		beego.Debug("get response: ", getResponse)
+		if 1 == getResponse.Count {
+			data = string(getResponse.Kvs[0].Value)
+			if checkValue {
+				if data == value {
+					rt = true
+				}
+			} else {
+				rt = true
+			}
+		}
+	}
+
+	return rt, data, rtErr
+}
+
+func getConfig(key string, reversion int64) (config ConfigData, rt bool, rtErr error) {
+	rtErr = nil
+	rt = false
+
+	var err error
+	var getResponse *clientv3.GetResponse
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(etcdObject.timeout)*time.Second)
+	if reversion > 0 {
+		getResponse, err = etcdObject.etcdClient.Get(ctx, key, clientv3.WithRev(reversion))
+	} else {
+		getResponse, err = etcdObject.etcdClient.Get(ctx, key)
+	}
+	cancel()
+
+	if err != nil {
+		rtErr = err
+		etcdReconnect(err)
+	} else {
+		beego.Debug("get response: ", getResponse)
+		if 1 == getResponse.Count {
+			if err := json.Unmarshal(getResponse.Kvs[0].Value, &config); err != nil {
+				rtErr = err
+			} else {
+				config.ConfigReversion = getResponse.Kvs[0].ModRevision
+				rt = true
+			}
+		}
+	}
+
+	return config, rt, rtErr
+}
+
+func getHistory(key string) (configList []ConfigData, rtErr error) {
+	rtErr = nil
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(etcdObject.timeout)*time.Second)
+	getResponse, err := etcdObject.etcdClient.Get(ctx, key+REVERSION_KEY_POSTFIX)
+	cancel()
+	if err != nil {
+		rtErr = err
+		etcdReconnect(err)
+	} else {
+		if 0 < getResponse.Count {
+			data := string(getResponse.Kvs[0].Value)
+			dataSlice := strings.Split(data, ",")
+
+			var reversion int64
+			for _, reversionData := range dataSlice {
+				if reversion, err = strconv.ParseInt(reversionData, 10, 64); nil == err {
+					config, rt, err := getConfig(key, reversion)
+					if err == nil && rt {
+						configList = append(configList, config)
+					}
+				}
+			}
+		}
+	}
+
+	return configList, rtErr
+}
+
+func getChildListByPrefix(prefix string) (childList []string, rtErr error) {
+	rtErr = nil
+
+	if prefix[len(prefix)-1] != '/' {
+		prefix = prefix + "/"
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(etcdObject.timeout)*time.Second)
+	getChildListResponse, err := etcdObject.etcdClient.Get(ctx, prefix, clientv3.WithPrefix())
+	cancel()
+	if err != nil {
+		rtErr = err
+		etcdReconnect(err)
+	} else {
+		beego.Debug("get childList response: ", getChildListResponse)
+
+		childSet := mapset.NewSet()
+		child := ""
+
+		for _, kv := range getChildListResponse.Kvs {
+			child = string(kv.Key)
+			child = strings.Replace(child, prefix, "", 1)
+			child_slice := strings.Split(child, "/")
+			child = child_slice[0]
+			childSet.Add(child)
+		}
+
+		childSlice := childSet.ToSlice()
+		for _, v := range childSlice {
+			childList = append(childList, fmt.Sprint(v))
+		}
+
+		beego.Debug("childList: ", childList)
+	}
+
+	return childList, rtErr
+}
+func getConfigListByApp(configKey string) (configList []NsConfigData, rtErr error) {
+	rtErr = nil
+
+	if configKey[len(configKey)-1] != '/' {
+		configKey = configKey + "/"
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(etcdObject.timeout)*time.Second)
+	getChildListResponse, err := etcdObject.etcdClient.Get(ctx, configKey, clientv3.WithPrefix())
+	cancel()
+	if err != nil {
+		rtErr = err
+		etcdReconnect(err)
+	} else {
+		beego.Debug("get childList response: ", getChildListResponse)
+
+		appname := ""
+
+		for _, kv := range getChildListResponse.Kvs {
+			appname = string(kv.Key)
+			appname = strings.Replace(appname, configKey, "", 1)
+			appnameSlice := strings.Split(appname, "/")
+			appname = appnameSlice[0]
+
+			var appConfigData NsConfigData
+			if err = json.Unmarshal(kv.Value, &appConfigData); nil == err {
+				appConfigData.NameSpace = appname
+				appConfigData.ConfigReversion = kv.ModRevision
+				configList = append(configList, appConfigData)
+			} else {
+				beego.Error("GetConfigListByApp | failed to marshal json | data: ", string(kv.Value))
+			}
+		}
+
+		beego.Debug("configList: ", configList)
+	}
+
+	return configList, rtErr
+}
+
+func InitEtcdClient(etcdUri []string, timeout int64, retainHisotryCount int) bool {
+	rt := false
+
+	beego.Debug("InitEtcdClient | etcdUri: ", etcdUri, " | timeout: ", timeout,
+		" | retainHisotryCount: ", retainHisotryCount)
+	etcdClient, err := clientv3.New(clientv3.Config{
+		Endpoints:   etcdUri,
+		DialTimeout: time.Duration(timeout) * time.Second,
+	})
+
+	if nil != err {
+		beego.Error("failed to clientv3.New | error msg: ", err)
+	} else {
+		etcdObject.uri = etcdUri
+		etcdObject.timeout = timeout
+		etcdObject.etcdClient = etcdClient
+		etcdObject.retainHistoryCount = retainHisotryCount
+
+		rt = true
+	}
+
+	return rt
+}
+
+func putDataInEtcd(configType string, configUser string, configValue string, configKey string, oldReversion int64) (errCode int, errMsg string, reversion int64) {
+	errCode = OK
+	errMsg = ERROR_MSG[OK]
+	reversion = -1
+
+	var etcdSaveData = EtcdSaveData{
+		ConfigType:    configType,
+		ConfigUser:    configUser,
+		ConfigValue:   configValue,
+		ConfigModTime: time.Now().UnixNano() / 1000000,
+	}
+	realData, err := json.Marshal(etcdSaveData)
+	if nil != err {
+		beego.Error("pubDataInEtcd | failed to marshal etcdSaveData | error msg: ", err)
+		errCode = INTERNAL_ERROR_ETCD
+		errMsg = makeErrorMsg(INTERNAL_ERROR_ETCD, err)
+	} else {
+		ctx, cancel := context.WithTimeout(context.Background(), time.Duration(etcdObject.timeout)*time.Second)
+		putResponse, err := etcdObject.etcdClient.Put(ctx, configKey, string(realData))
+		cancel()
+		if err != nil {
+			errCode = INTERNAL_ERROR_ETCD
+			errMsg = makeErrorMsg(INTERNAL_ERROR_ETCD, err)
+			etcdReconnect(err)
+		} else {
+			beego.Debug("pubDataInEtcd | ok | key: ", configKey, " | type: ", configType,
+				" | value: ", configValue, " | put response: ", putResponse)
+			updateConfigReversion(configKey, putResponse.Header.Revision, oldReversion)
+
+			reversion = putResponse.Header.Revision
+		}
+	}
+
+	return errCode, errMsg, reversion
+}
+
+func checkConfigKey(configKey string) bool {
+	rt := true
+
+	if configKey[len(configKey)-1] == '/' {
+		rt = false
+	}
+
+	return rt
+}
+
+func checkAppkeyByListApp(appKey string) bool {
+	rt := false
+
+	if 1 == strings.Count(appKey, "/") &&
+		appKey[0] == '/' &&
+		appKey[len(appKey)-1] != '/' {
+		rt = true
+	}
+
+	return rt
+}
+
+func checkAppkeyByGetConfigList(appKey string) bool {
+	rt := false
+
+	if 2 == strings.Count(appKey, "/") &&
+		appKey[0] == '/' &&
+		appKey[len(appKey)-1] != '/' {
+		rt = true
+	}
+
+	return rt
+}
+
+func checkAppkeyByGetConfig(appKey string) bool {
+	rt := false
+
+	if 3 == strings.Count(appKey, "/") &&
+		appKey[0] == '/' &&
+		appKey[len(appKey)-1] != '/' {
+		rt = true
+	}
+
+	return rt
+}
+
+func CreateConfig(requesti interface{}, responsei interface{}) {
+	var request = requesti.(*CreateConfigRequest)
+	var response = responsei.(*CreateConfigReresponse)
+
+	if nil != request {
+		if "" == request.ConfigKey ||
+			"" == request.ConfigValue ||
+			"" == request.ConfigUser ||
+			"" == request.ConfigType {
+			beego.Error("CreateConfig | failed | key: ", request.ConfigKey,
+				" | type: ", request.ConfigType, " | value: ", request.ConfigKey)
+			response.ErrorCode = KEY_OR_VALUE_IS_NULL
+			response.ErrorMsg = ERROR_MSG[KEY_OR_VALUE_IS_NULL]
+		} else if !checkConfigKey(request.ConfigKey) {
+			beego.Error("CreateConfig | failed: key is invalid | key: ", request.ConfigKey,
+				" | type: ", request.ConfigType, " | value: ", request.ConfigKey)
+			response.ErrorCode = KEY_IS_INVALID
+			response.ErrorMsg = ERROR_MSG[KEY_IS_INVALID]
+		} else if rt, _, rtErr := isExistConfig(request.ConfigKey, request.ConfigValue, false); rtErr == nil {
+			if rt {
+				beego.Debug("CreateConfig | config exist | key: ", request.ConfigKey, " | type: ", request.ConfigType,
+					" | value: ", request.ConfigValue)
+				response.ErrorCode = CONFIG_EXISTS
+				response.ErrorMsg = ERROR_MSG[CONFIG_EXISTS]
+			} else {
+				response.ErrorCode, response.ErrorMsg, response.ConfigReversion = putDataInEtcd(request.ConfigType,
+					request.ConfigUser,
+					request.ConfigValue,
+					request.ConfigKey,
+					-1)
+			}
+		} else {
+			response.ErrorCode = INTERNAL_ERROR_ETCD
+			response.ErrorMsg = makeErrorMsg(INTERNAL_ERROR_ETCD, rtErr)
+			beego.Error("CreateConfig | failed | key: ", request.ConfigKey, " | type: ", request.ConfigType,
+				" | value: ", request.ConfigValue, " | error msg: ", rtErr)
+		}
+
+		response.UserKey = request.ConfigKey
+	} else {
+		response.ErrorCode = FAILED_TO_PARSE_REQUEST
+		response.ErrorMsg = ERROR_MSG[FAILED_TO_PARSE_REQUEST]
+		beego.Error("CreateConfig | failed | error msg: request is nil")
+	}
+}
+
+func BatchCreateConfig(requesti interface{}, responsei interface{}) {
+	var request_list = requesti.(*BatchCreateConfigRequest)
+	var response_list = responsei.(*BatchCreateConfigResponse)
+
+	if nil != request_list {
+		for _, request := range request_list.CreateConfigList {
+			response := &CreateConfigReresponse{}
+			CreateConfig(&request, response)
+
+			response_list.CreateConfigList = append(response_list.CreateConfigList, *response)
+		}
+	}
+}
+
+func UpdateConfig(requesti interface{}, responsei interface{}) {
+	var request = requesti.(*UpdateConfigRequest)
+	var response = responsei.(*UpdateConfigResponse)
+
+	if nil != request {
+		if "" == request.ConfigKey ||
+			"" == request.ConfigValue ||
+			"" == request.ConfigUser ||
+			"" == request.ConfigType {
+			beego.Error("UpdateConfig | failed | key: ", request.ConfigKey,
+				" | type: ", request.ConfigType, " | value: ", request.ConfigKey)
+			response.ErrorCode = KEY_OR_VALUE_IS_NULL
+			response.ErrorMsg = ERROR_MSG[KEY_OR_VALUE_IS_NULL]
+		} else if rt, data, rtErr := isExistConfig(request.ConfigKey, request.ConfigValue, false); rtErr == nil {
+			if !rt {
+				beego.Debug("UpdateConfig | config not exist | key: ", request.ConfigKey, " | type: ", request.ConfigType,
+					" | value: ", request.ConfigValue)
+				response.ErrorCode = CONFIG_NOT_EXISTS
+				response.ErrorMsg = ERROR_MSG[CONFIG_NOT_EXISTS]
+				response.ConfigKey = request.ConfigKey
+			} else {
+				if data == request.ConfigValue {
+					response.ErrorCode = CONFIG_EXISTS
+					response.ErrorMsg = ERROR_MSG[CONFIG_EXISTS]
+				} else {
+					response.ErrorCode, response.ErrorMsg, response.ConfigReversion = putDataInEtcd(request.ConfigType,
+						request.ConfigUser,
+						request.ConfigValue,
+						request.ConfigKey,
+						-1)
+					response.ConfigKey = request.ConfigKey
+				}
+			}
+		} else {
+			response.ErrorCode = INTERNAL_ERROR_ETCD
+			response.ErrorMsg = makeErrorMsg(INTERNAL_ERROR_ETCD, rtErr)
+			beego.Error("UpdateConfig | failed | key: ", request.ConfigKey, " | type: ", request.ConfigType,
+				" | value: ", request.ConfigValue, " | error msg: ", rtErr)
+		}
+
+		response.ConfigKey = request.ConfigKey
+	} else {
+		response.ErrorCode = FAILED_TO_PARSE_REQUEST
+		response.ErrorMsg = ERROR_MSG[FAILED_TO_PARSE_REQUEST]
+		beego.Error("UpdateConfig | failed | error msg: request is nil")
+	}
+}
+
+func DeleteConfig(requesti interface{}, responsei interface{}) {
+	var request = requesti.(*DeleteConfigRequest)
+	var response = responsei.(*DefaultConfigResponse)
+	if nil != request {
+		if "" == request.ConfigKey {
+			beego.Error("DeleteConfig | failed | key: ", request.ConfigKey)
+			response.ErrorCode = KEY_OR_VALUE_IS_NULL
+			response.ErrorMsg = ERROR_MSG[KEY_OR_VALUE_IS_NULL]
+		} else if rt, _, rtErr := isExistConfig(request.ConfigKey, "", false); rtErr == nil {
+			if !rt {
+				beego.Debug("DeleteConfig | config not exist | key: ", request.ConfigKey)
+				response.ErrorCode = CONFIG_NOT_EXISTS
+				response.ErrorMsg = ERROR_MSG[CONFIG_NOT_EXISTS]
+			} else {
+				//TODO:use tx
+				ctx, cancel := context.WithTimeout(context.Background(), time.Duration(etcdObject.timeout)*time.Second)
+				deleteResponse, err := etcdObject.etcdClient.Delete(ctx, request.ConfigKey)
+				cancel()
+				if err != nil {
+					response.ErrorCode = INTERNAL_ERROR_ETCD
+					response.ErrorMsg = makeErrorMsg(INTERNAL_ERROR_ETCD, err)
+					etcdReconnect(err)
+				} else {
+					beego.Debug("DeleteConfig | ok | key: ", request.ConfigKey, " | put response: ", deleteResponse)
+					ctx, cancel := context.WithTimeout(context.Background(), time.Duration(etcdObject.timeout)*time.Second)
+					_, err := etcdObject.etcdClient.Delete(ctx, request.ConfigKey+REVERSION_KEY_POSTFIX)
+					cancel()
+					if err != nil {
+						beego.Debug("DeleteConfig | failed to reversion history | key: ", request.ConfigKey, " | err: ", err)
+					}
+					response.ErrorCode = OK
+					response.ErrorMsg = ERROR_MSG[OK]
+				}
+			}
+		} else {
+			response.ErrorCode = INTERNAL_ERROR_ETCD
+			response.ErrorMsg = makeErrorMsg(INTERNAL_ERROR_ETCD, rtErr)
+			beego.Error("DeleteConfig | failed | key: ", request.ConfigKey, " | error msg: ", rtErr)
+		}
+	} else {
+		response.ErrorCode = FAILED_TO_PARSE_REQUEST
+		response.ErrorMsg = ERROR_MSG[FAILED_TO_PARSE_REQUEST]
+		beego.Error("DeleteConfig | failed | error msg: request is nil")
+	}
+}
+
+func BatchDeleteConfig(requesti interface{}, responsei interface{}) {
+	var request_list = requesti.(*BatchDeleteConfigRequest)
+	var response_list = responsei.(*BatchDeleteConfigResponse)
+
+	if nil != request_list {
+		for _, request := range request_list.ConfigKeys {
+			response := &DefaultConfigResponse{}
+			DeleteConfig(&request, response)
+
+			response_list.ConfigKeys = append(response_list.ConfigKeys, *response)
+		}
+	}
+}
+
+func ListApp(requesti interface{}, responsei interface{}) {
+	var request = requesti.(*ListAppRequest)
+	var response = responsei.(*ListAppResponse)
+
+	if nil != request {
+		if "" == request.ConfigAppKey {
+			beego.Error("ListAppConfig | failed | key: ", request.ConfigAppKey)
+			response.ErrorCode = KEY_OR_VALUE_IS_NULL
+			response.ErrorMsg = ERROR_MSG[KEY_OR_VALUE_IS_NULL]
+		} else if !checkAppkeyByListApp(request.ConfigAppKey) {
+			beego.Error("ListApp | failed: key is invalid | key: ", request.ConfigAppKey)
+			response.ErrorCode = KEY_IS_INVALID
+			response.ErrorMsg = ERROR_MSG[KEY_IS_INVALID]
+		} else if childList, rtErr := getChildListByPrefix(request.ConfigAppKey); rtErr == nil {
+			if len(childList) > 0 {
+				response.ErrorCode = OK
+				response.ErrorMsg = ERROR_MSG[OK]
+				response.ConfigAppKey = request.ConfigAppKey
+				response.AppList = childList
+			} else {
+				response.ConfigAppKey = request.ConfigAppKey
+				response.ErrorCode = CONFIG_NOT_EXISTS
+				response.ErrorMsg = ERROR_MSG[CONFIG_NOT_EXISTS]
+			}
+		} else {
+			response.ErrorCode = INTERNAL_ERROR_ETCD
+			response.ErrorMsg = makeErrorMsg(INTERNAL_ERROR_ETCD, rtErr)
+			beego.Error("ListApp | failed | key: ", request.ConfigAppKey, " | error msg: ", rtErr)
+		}
+	} else {
+		response.ErrorCode = FAILED_TO_PARSE_REQUEST
+		response.ErrorMsg = ERROR_MSG[FAILED_TO_PARSE_REQUEST]
+		beego.Error("ListApp | failed | error msg: request is nil")
+	}
+}
+
+func GetConfigListByApp(requesti interface{}, responsei interface{}) {
+	var request = requesti.(*ListAppRequest)
+	var response = responsei.(*GetConfigListByAppResponse)
+
+	if nil != request {
+		if "" == request.ConfigAppKey {
+			beego.Error("GetConfigListByApp | failed | key: ", request.ConfigAppKey)
+			response.ErrorCode = KEY_OR_VALUE_IS_NULL
+			response.ErrorMsg = ERROR_MSG[KEY_OR_VALUE_IS_NULL]
+		} else if !checkAppkeyByGetConfigList(request.ConfigAppKey) {
+			beego.Error("GetConfigListByApp | failed: key is invalid | key: ", request.ConfigAppKey)
+			response.ErrorCode = KEY_IS_INVALID
+			response.ErrorMsg = ERROR_MSG[KEY_IS_INVALID]
+		} else if childList, rtErr := getConfigListByApp(request.ConfigAppKey); rtErr == nil {
+			if len(childList) > 0 {
+				response.ErrorCode = OK
+				response.ErrorMsg = ERROR_MSG[OK]
+				response.ConfigAppKey = request.ConfigAppKey
+				response.ConfigList = childList
+			} else {
+				response.ConfigAppKey = request.ConfigAppKey
+				response.ErrorCode = CONFIG_NOT_EXISTS
+				response.ErrorMsg = ERROR_MSG[CONFIG_NOT_EXISTS]
+			}
+		} else {
+			response.ErrorCode = INTERNAL_ERROR_ETCD
+			response.ErrorMsg = makeErrorMsg(INTERNAL_ERROR_ETCD, rtErr)
+			beego.Error("GetConfigListByApp | failed | key: ", request.ConfigAppKey, " | error msg: ", rtErr)
+		}
+	} else {
+		response.ErrorCode = FAILED_TO_PARSE_REQUEST
+		response.ErrorMsg = ERROR_MSG[FAILED_TO_PARSE_REQUEST]
+		beego.Error("GetConfigListByApp | failed | error msg: request is nil")
+	}
+}
+
+func GetConfig(requesti interface{}, responsei interface{}) {
+	var request = requesti.(*ListAppRequest)
+	var response = responsei.(*GetConfigResponse)
+
+	if nil != request {
+		if "" == request.ConfigAppKey {
+			beego.Error("GetConfig | failed | key: ", request.ConfigAppKey)
+			response.ErrorCode = KEY_OR_VALUE_IS_NULL
+			response.ErrorMsg = ERROR_MSG[KEY_OR_VALUE_IS_NULL]
+		} else if !checkAppkeyByGetConfig(request.ConfigAppKey) {
+			beego.Error("GetConfig | failed: key is invalid | key: ", request.ConfigAppKey)
+			response.ErrorCode = KEY_IS_INVALID
+			response.ErrorMsg = ERROR_MSG[KEY_IS_INVALID]
+		} else if config, rt, rtErr := getConfig(request.ConfigAppKey, -1); rtErr == nil {
+			if rt {
+				response.ErrorCode = OK
+				response.ErrorMsg = ERROR_MSG[OK]
+				response.ConfigAppKey = request.ConfigAppKey
+				response.Config = config
+			} else {
+				response.ConfigAppKey = request.ConfigAppKey
+				response.ErrorCode = CONFIG_NOT_EXISTS
+				response.ErrorMsg = ERROR_MSG[CONFIG_NOT_EXISTS]
+			}
+		} else {
+			response.ErrorCode = INTERNAL_ERROR_ETCD
+			response.ErrorMsg = makeErrorMsg(INTERNAL_ERROR_ETCD, rtErr)
+			beego.Error("GetConfig | failed | key: ", request.ConfigAppKey, " | error msg: ", rtErr)
+		}
+	} else {
+		response.ErrorCode = FAILED_TO_PARSE_REQUEST
+		response.ErrorMsg = ERROR_MSG[FAILED_TO_PARSE_REQUEST]
+		beego.Error("GetConfig | failed | error msg: request is nil")
+	}
+}
+
+func GetHistoryList(requesti interface{}, responsei interface{}) {
+	var request = requesti.(*ListAppRequest)
+	var response = responsei.(*GetHistoryListResponse)
+
+	if nil != request {
+		if "" == request.ConfigAppKey {
+			beego.Error("GetHistoryList | failed | key: ", request.ConfigAppKey)
+			response.ErrorCode = KEY_OR_VALUE_IS_NULL
+			response.ErrorMsg = ERROR_MSG[KEY_OR_VALUE_IS_NULL]
+		} else if !checkAppkeyByGetConfig(request.ConfigAppKey) {
+			beego.Error("GetHistoryList | failed: key is invalid | key: ", request.ConfigAppKey)
+			response.ErrorCode = KEY_IS_INVALID
+			response.ErrorMsg = ERROR_MSG[KEY_IS_INVALID]
+		} else if configList, rtErr := getHistory(request.ConfigAppKey); rtErr == nil {
+			if len(configList) > 0 {
+				response.ErrorCode = OK
+				response.ErrorMsg = ERROR_MSG[OK]
+				response.ConfigAppKey = request.ConfigAppKey
+				response.ConfigList = configList
+			} else {
+				response.ConfigAppKey = request.ConfigAppKey
+				response.ErrorCode = CONFIG_NOT_EXISTS
+				response.ErrorMsg = ERROR_MSG[CONFIG_NOT_EXISTS]
+			}
+		} else {
+			response.ErrorCode = INTERNAL_ERROR_ETCD
+			response.ErrorMsg = makeErrorMsg(INTERNAL_ERROR_ETCD, rtErr)
+			beego.Error("GetHistoryList | failed | key: ", request.ConfigAppKey, " | error msg: ", rtErr)
+		}
+	} else {
+		response.ErrorCode = FAILED_TO_PARSE_REQUEST
+		response.ErrorMsg = ERROR_MSG[FAILED_TO_PARSE_REQUEST]
+		beego.Error("GetHistoryList | failed | error msg: request is nil")
+	}
+}
+
+func getHistoryByReversion(key string, reversion int64) (config ConfigData, rt bool) {
+	rt = false
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(etcdObject.timeout)*time.Second)
+	getResponse, err := etcdObject.etcdClient.Get(ctx, key+REVERSION_KEY_POSTFIX)
+	cancel()
+	if err != nil {
+		etcdReconnect(err)
+	} else {
+		if 0 < getResponse.Count {
+			data := string(getResponse.Kvs[0].Value)
+			dataSlice := strings.Split(data, ",")
+
+			for _, reversionData := range dataSlice {
+				if currReversion, err := strconv.ParseInt(reversionData, 10, 64); nil == err {
+					if currReversion == reversion {
+						config, rt, err = getConfig(key, reversion)
+						if err == nil && rt {
+							rt = true
+						}
+						break
+					}
+				}
+			}
+		}
+	}
+
+	return config, rt
+}
+
+func RollbackConfig(requesti interface{}, responsei interface{}) {
+	var request = requesti.(*RollbackConfigRequest)
+	var response = responsei.(*UpdateConfigResponse)
+
+	if nil != request {
+		if "" == request.ConfigKey ||
+			"" == request.ConfigUser ||
+			0 >= request.ConfigReversion {
+			beego.Error("RollbackConfig | failed | key: ", request.ConfigKey,
+				" | user: ", request.ConfigUser,
+				" | reversion: ", request.ConfigReversion)
+			response.ErrorCode = KEY_OR_VALUE_IS_NULL
+			response.ErrorMsg = ERROR_MSG[KEY_OR_VALUE_IS_NULL]
+		} else if !checkAppkeyByGetConfig(request.ConfigKey) {
+			beego.Error("RollbackConfig | failed: key is invalid | key: ", request.ConfigKey)
+			response.ErrorCode = KEY_IS_INVALID
+			response.ErrorMsg = ERROR_MSG[KEY_IS_INVALID]
+		} else if rt, _, rtErr := isExistConfig(request.ConfigKey, request.ConfigValue, false); rtErr == nil {
+			if !rt {
+				beego.Debug("RollbackConfig | config not exist | key: ", request.ConfigKey, " | type: ", request.ConfigType,
+					" | value: ", request.ConfigValue)
+				response.ErrorCode = CONFIG_NOT_EXISTS
+				response.ErrorMsg = ERROR_MSG[CONFIG_NOT_EXISTS]
+				response.ConfigKey = request.ConfigKey
+			} else {
+				configData, rt := getHistoryByReversion(request.ConfigKey, request.ConfigReversion)
+				if rt {
+					response.ErrorCode, response.ErrorMsg, response.ConfigReversion = putDataInEtcd(configData.ConfigType,
+						request.ConfigUser,
+						configData.ConfigValue,
+						request.ConfigKey,
+						request.ConfigReversion)
+				} else {
+					response.ErrorCode = ROLLBACK_FAILED_GET_HISTORY_REVERSION
+					response.ErrorMsg = ERROR_MSG[ROLLBACK_FAILED_GET_HISTORY_REVERSION]
+					beego.Error("RollbackConfig | failed to get history reversion | key: ", request.ConfigKey, " | type: ", request.ConfigType,
+						" | value: ", request.ConfigValue, " | err msg: ", response.ErrorMsg)
+				}
+			}
+		} else {
+			response.ErrorCode = INTERNAL_ERROR_ETCD
+			response.ErrorMsg = makeErrorMsg(INTERNAL_ERROR_ETCD, rtErr)
+			beego.Error("RollbackConfig | failed | key: ", request.ConfigKey, " | type: ", request.ConfigType,
+				" | value: ", request.ConfigValue, " | error msg: ", rtErr)
+		}
+
+		response.ConfigKey = request.ConfigKey
+	} else {
+		response.ErrorCode = FAILED_TO_PARSE_REQUEST
+		response.ErrorMsg = ERROR_MSG[FAILED_TO_PARSE_REQUEST]
+		beego.Error("RollbackConfig | failed | error msg: request is nil")
+	}
+}
+
+func GetSubBusinessList(requesti interface{}, responsei interface{}) {
+	var response = responsei.(*GetSubBusinessListResponse)
+	if childList, rtErr := getChildListByPrefix("/"); rtErr == nil {
+		if len(childList) > 0 {
+			response.ErrorCode = OK
+			response.ErrorMsg = ERROR_MSG[OK]
+			response.SubBusiness = childList
+		} else {
+			response.ErrorCode = CONFIG_NOT_EXISTS
+			response.ErrorMsg = ERROR_MSG[CONFIG_NOT_EXISTS]
+		}
+	} else {
+		response.ErrorCode = INTERNAL_ERROR_ETCD
+		response.ErrorMsg = makeErrorMsg(INTERNAL_ERROR_ETCD, rtErr)
+		beego.Error("GetSubBusinessLis| failed | error msg: ", rtErr)
+	}
+}

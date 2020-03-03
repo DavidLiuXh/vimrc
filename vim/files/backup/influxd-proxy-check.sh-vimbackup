@@ -1,0 +1,6 @@
+#!/bin/bash
+
+ps aux | grep supervise | grep influx-proxy | grep -v grep >> /dev/null
+if [ 0 != $? ]; then
+	nohup /usr/local/bin/supervise /data1/influx-proxy &
+fi

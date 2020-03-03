@@ -1,0 +1,2 @@
+1. 将resultset.go复制到$GAPATH/src/github.com/influxdata/platform/storage/reads下;
+1. 将store.go复制到$GAPATH/src/github.com/influxdata/platform/storage/reads下;

@@ -1,0 +1,37 @@
+package monitor
+
+import (
+	"os"
+	"time"
+
+	"github.com/influxdata/influxdb/monitor/diagnostics"
+	"github.com/shirou/gopsutil/process"
+)
+
+var ProcessInfo *process.Process = nil
+
+func init() {
+	ProcessInfo, _ = process.NewProcess(int32(os.Getpid()))
+}
+
+type procinfo struct {
+}
+
+func (b *procinfo) Diagnostics() (*diagnostics.Diagnostics, error) {
+	var cpuUsage float64 = -1
+	var memUsage uint64 = 0
+
+	if nil != ProcessInfo {
+		cpuUsage, _ = ProcessInfo.Percent(1000 * time.Millisecond)
+		memInfoStat, err := ProcessInfo.MemoryInfo()
+		if nil == err {
+			memUsage = memInfoStat.RSS
+		}
+	}
+	d := map[string]interface{}{
+		"CPU": cpuUsage,
+		"MEM": memUsage,
+	}
+
+	return diagnostics.RowFromMap(d), nil
+}

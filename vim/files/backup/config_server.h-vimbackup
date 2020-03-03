@@ -1,0 +1,88 @@
+#ifndef PEANUTS_CONFIG_SERVER_INCLUDE_H_
+#define PEANUTS_CONFIG_SERVER_INCLUDE_H_
+
+#include <memory>
+#include <string>
+#include <atomic>
+#include <stdint.h>
+
+#include "config_storage.h"
+#include "watch_thread.h"
+#include "updater.h"
+#include "feedback.h"
+#include "acceptor.h"
+#include "socket.h"
+#include "option.h"
+#include "http_config.h"
+
+namespace qcm {
+namespace http {
+  class HttpServer;
+}
+}
+
+namespace peanuts {
+
+class ConfigServer {
+  public:
+    ConfigServer(const Option& opt);
+    ~ConfigServer();
+
+    int Init();
+    void Start();
+    int Stop();
+
+  private:
+    std::unique_ptr<qcm::http::HttpServer> http_server_;
+    std::shared_ptr<store::ConfigStorage> configs_;
+    std::unique_ptr<store::WatchThread> watch_thread_;
+
+    std::shared_ptr<FeedBack> feedback_thread_;
+    std::shared_ptr<Acceptor> acceptor_thread_;
+    std::shared_ptr<Updater> updater_thread_;
+
+    Option option_;
+    bool inited_;
+    bool is_start_;
+
+    std::string server_ip_;
+    uint16_t server_port_;
+    uint32_t worker_num_;
+
+    std::string redis_ip_;
+    uint16_t redis_port_;
+    std::string redis_pwd_;
+
+    int64_t max_revision_interval_;
+    std::string key_prefix_;
+    int64_t reconn_interval_;
+    std::string db_name_;
+    std::string address_;
+    uint32_t request_timeout_;
+
+    std::string log_dir_;
+    uint32_t max_log_size_;
+    uint32_t log_clean_days_;
+    std::string server_name_;
+
+    qcm::http::Config http_config_;
+
+    static const std::string SERVER_IP;
+    static const std::string SERVER_PORT;
+    static const std::string WORKER_NUM;
+    static const std::string REDIS_IP;
+    static const std::string REDIS_PORT;
+    static const std::string REDIS_PWD;
+    static const std::string MAX_REVISION_INTERVAL;
+    static const std::string KEY_PREFIX;
+    static const std::string RECONN_INTERVAL;
+    static const std::string DB_NAME;
+    static const std::string ADDRESS;
+    static const std::string REQUEST_TIMEOUT;
+    static const std::string LOG_CLEAN_DAYS;
+    static const std::string SERVER_NAME;
+};
+
+} // namespace peanuts
+
+#endif //PEANUTS_CONFIG_SERVER_INCLUDE_H_

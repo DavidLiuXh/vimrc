@@ -1,0 +1,62 @@
+ifdef debug
+	OPT = -g -O0
+else 
+	OPT = -O2 -DNDEBUG
+endif
+
+CXX = g++
+BIN_DIR = ./bin
+COMMON_DIR = ../common
+SRC_DIR = ./net
+STORE_DIR = ./store
+PROTOCC_DIR = ../protocc
+HTTP_SERVER_DIR = ./http
+$(shell mkdir -p ${BIN_DIR})
+
+GLOG = ../third/glog
+HIREDIS = ../third/hiredis
+ROCKSDB = ../third/rocksdb
+JSONCPP = ../third/jsoncpp
+PROTOBUF = ../third/protobuf
+GRPC = ../third/grpc
+PISTACHE = ../third/pistache
+
+CXXFLAGS = $(OPT) -std=c++14 -fPIC -W -Wextra \
+           -I $(COMMON_DIR) -I $(SRC_DIR) -I $(STORE_DIR) -I $(PROTOCC_DIR) -I $(HTTP_SERVER_DIR) \
+	   -I $(PISTACHE)/include \
+           -I /usr/local/include/hiredis
+
+LDFLAGS = -Wl,-dn -lprotobuf \
+	  -lgrpc++ -lgrpc -lgrpc++_reflection\
+	  -lglog \
+	  -lrocksdb \
+	  -lhiredis \
+	  -ljsoncpp \
+	  -L $(PISTACHE)/build/src -lpistache \
+	  -Wl,-dy -lpthread -lssl -lcrypto -ldl -lrt -lz \
+	  -Wl,--as-needed -Wl,-rpath ./ \
+	  -static-libstdc++ -static-libgcc
+
+
+SRCS := $(wildcard $(COMMON_DIR)/*.cc)
+SRCS += $(wildcard $(SRC_DIR)/*.cc)
+SRCS += $(wildcard $(STORE_DIR)/*.cc)
+SRCS += $(wildcard $(PROTOCC_DIR)/*.cc)
+SRCS += $(wildcard $(HTTP_SERVER_DIR)/*.cc)
+
+OBJS = $(patsubst %.cc,%.o,$(SRCS))
+
+CONFIG_SERVER = $(BIN_DIR)/config-server
+
+all: $(CONFIG_SERVER)
+
+$(CONFIG_SERVER) : $(OBJS) 
+	#ln -s `g++ -print-file-name=libstdc++.a`
+	$(CXX) -o $@ $^ $(LDFLAGS)
+
+%.o : %.cc
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+.PTHON: clean
+clean:
+	#rm -rf $(BIN_DIR) $(OBJS) libstdc++.a

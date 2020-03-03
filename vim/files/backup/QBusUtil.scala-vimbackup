@@ -1,0 +1,119 @@
+package controllers
+
+import scala.util.{Failure, Success, Try}
+import scala.concurrent.{ExecutionContext, Future, Await}
+import scala.concurrent.duration._
+import scala.util.control.Breaks._
+
+import play.api.Logger
+import play.api.libs.ws._
+import play.api.libs.json._
+import play.api.libs.ws.ning._
+import scala.collection.mutable.Set
+
+object QBusUtil {
+  def getZkListByClusterName(cluster: String): String = {
+    import play.api.libs.concurrent.Execution.Implicits.defaultContext
+    val logger: Logger = Logger("kafka.manager")
+    val zkQueryUrl:String = "http://qconf-conf.add.corp.qihoo.net:8360/qconf-http/QconfHttp.php"
+    var zkList: String = ""
+
+    var qconfCluster = Array("corp", "bjdt", "zzbc", "gzst")  
+
+    for (qconf <- qconfCluster) {
+      if (zkList != "") {
+        return zkList
+      }
+
+      val ws = NingWSClient()
+
+      Try(Await.result(ws.url(zkQueryUrl)
+        .withHeaders("Content-type" -> "application/x-www-form-urlencoded")
+        .post("func=getConf&key=/qbus2/zk_list/" + cluster + "&idc=" + qconf),
+        3 second)) match {
+          case Success(response) =>
+            zkList = response.asInstanceOf[WSResponse].body
+            if (zkList.contains(":2181")) {
+              zkList = zkList.subSequence(1, zkList.length - 1).toString()
+            } else {
+              zkList = ""
+            }
+          case Failure(ex) =>
+            zkList = ""
+        }
+
+        Try(ws.close())
+    }
+
+    zkList
+  }
+
+  def getRedisInfoByClusterName(cluster: String): String = {
+    import play.api.libs.concurrent.Execution.Implicits.defaultContext
+    val logger: Logger = Logger("kafka.manager")
+    val zkQueryUrl:String = "http://qconf-conf.add.corp.qihoo.net:8360/qconf-http/QconfHttp.php"
+    var zkList: String = ""
+
+    var qconfCluster = Array("corp", "bjdt", "zzbc", "gzst")  
+
+    for (qconf <- qconfCluster) {
+      if (zkList != "") {
+        return zkList
+      }
+
+      val ws = NingWSClient()
+
+      Try(Await.result(ws.url(zkQueryUrl)
+        .withHeaders("Content-type" -> "application/x-www-form-urlencoded")
+        .post("func=getConf&key=/qbus2/logcollection/redis/" + cluster + "&idc=" + qconf),
+        3 second)) match {
+          case Success(response) =>
+            zkList = response.asInstanceOf[WSResponse].body
+            if (zkList.contains("|")) {
+              zkList = zkList.subSequence(1, zkList.length - 1).toString()
+            } else {
+              zkList = ""
+            }
+          case Failure(ex) =>
+            zkList = ""
+        }
+
+        Try(ws.close())
+    }
+
+    zkList
+  }
+
+  def getLogMachineListByTopic(cluster: String, topic: String, queryUrl: String): Set[String] = {
+    var machineList:Set[String] = Set()
+
+    import play.api.libs.concurrent.Execution.Implicits.defaultContext
+    val logger: Logger = Logger("kafka.manager")
+    //val queryUrl:String = "http://api.v3.hulk.corp.qihoo.net/?router=mix/qbus/api/topic/get-topic-producers"
+
+    val ws = NingWSClient()
+
+    Try(Await.result(ws.url(queryUrl)
+      .withHeaders("Content-type" -> "application/x-www-form-urlencoded")
+      .withHeaders("HULKSRC" -> "addops")
+      .post("&cluster=" + cluster + "&topic=" + topic),
+      3 second)) match {
+        case Success(response) =>
+          var machineJson = response.asInstanceOf[WSResponse].body
+          val dataJson: JsValue = Json.parse(machineJson)
+          (dataJson \ "data" \ "hostnames").asOpt[List[String]].map {
+            ml => {
+              for (m <- ml) {
+      logger.info("xxx | | " + m)
+                machineList.add(m)
+              }
+            }
+          }
+        case Failure(ex) =>
+      }
+
+      Try(ws.close())
+
+      machineList
+  }
+}
