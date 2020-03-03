@@ -1,0 +1,2 @@
+#!/bin/bash
+ctags --languages=C,C++ --extras=+fq --c-kinds=+px --c++-kinds=+px  --fields=+afimnKlsSzt -R .
