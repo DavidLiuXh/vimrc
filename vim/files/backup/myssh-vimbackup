@@ -1,2 +1,0 @@
-#! /bin/bash
-sshpass -p "liu&*()_+wei1982" ssh liuwei3-s@$1 -o StrictHostKeyChecking=no

@@ -1,8 +1,0 @@
-[global]
-
-[topic]
-
-[sdk]
-user.manual.commit.offset=true
-disable.zk=true
-broker.list=10.173.194.217:39092

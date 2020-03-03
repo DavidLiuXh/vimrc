@@ -1,5 +1,0 @@
-#!/bin/bash
-
-cd /opt/
-nohup ./XMind -data /home/lw/docs/xmind &
-

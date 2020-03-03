@@ -1,6 +1,0 @@
-<?php
-
-echo Qconf::getConf("/demo/test/confs/conf1/conf11");        // 获取当前节点的配置
-
-
-?>

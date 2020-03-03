@@ -1,2 +1,0 @@
-#!/bin/bash
-/home/infra/qcm_admin_server/qcm_admin_server -c /home/infra/qcm_admin_server/config/app.conf

@@ -1,7 +1,0 @@
-#!/bin/bash
-
-for i in `seq 1 10000`
-do 
-#   curl -i -XPOST "http://localhost:8086/write?db=my_test_db_3&rp=one_7day_only" --data-binary 'mymeasxxx1,mytag='$i' myfield=90 1463683075' --silent
-   curl -i -XPOST "http://localhost:8086/write?db=test_db_2&rp=rp3" --data-binary 'mymeas1,mytag111='$i' myfield=90' --silent
-done

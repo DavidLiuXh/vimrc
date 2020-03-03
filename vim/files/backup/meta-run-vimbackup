@@ -1,9 +1,0 @@
-#!/bin/bash
-
-
-if [ ! -e /home/infra/influx-meta/JOIN-CLUSTER ]; then
-	touch /home/infra/influx-meta/JOIN-CLUSTER
-	/home/infra/influx-meta/influxd-meta run -config /home/infra/influx-meta/meta.conf -bootstrap -join (cluster-list) >> /data1/influx-meta/influx-meta.log 2>&1
-else
-	/home/infra/influx-meta/influxd-meta run -config /home/infra/influx-meta/meta.conf >> /data1/influx-meta/influx-meta.log 2>&1
-fi

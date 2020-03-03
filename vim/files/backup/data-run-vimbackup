@@ -1,3 +1,0 @@
-#!/bin/bash
-
-/home/infra/influx-data/influxd-data run -config /data1/influx-data/data.conf

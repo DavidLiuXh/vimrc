@@ -1,7 +1,0 @@
-package util
-
-import "unsafe"
-
-func Slice2Str(strSlice []byte) string {
-	return *(*string)(unsafe.Pointer(&strSlice))
-}

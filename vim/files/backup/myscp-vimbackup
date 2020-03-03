@@ -1,2 +1,0 @@
-#! /bin/bash
-sshpass -p "1982weiliu914&*()_+"  scp liuwei3-s@$1:$2 $3 -o StrictHostKeyChecking=no
