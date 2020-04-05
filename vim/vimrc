@@ -220,3 +220,8 @@ map <Leader>p :tabp<CR>
 map <Leader>n :tabn<CR>
 map <Leader>f :tabfirst<CR>                                                                                                                                                                                    
 map <Leader>l :tablast<CR>
+
+if has("termguicolors")
+    " enable true color
+    set termguicolors
+endif
