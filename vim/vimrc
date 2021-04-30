@@ -30,6 +30,7 @@ set shortmess+=c
 
 " replace \ with ,
 :let mapleader=","                                                                                                                                                           
+let g:apc_cr_confirm = 1
 
 "tagbar
 nmap <F8> :TagbarToggle<CR>
@@ -91,7 +92,7 @@ set expandtab              " Use spaces instead of tabs.
 set softtabstop =2        " Tab key indents by 4 spaces
 set shiftwidth  =2         " >> indents by 4 spaces.
 set shiftround             " >> indents to next multiple of 'shiftwidth'.
-autocmd FileType c,cpp,cxx,cc,h,hxx,hpp set shiftwidth=1 | set expandtab
+autocmd FileType c,cpp,cxx,cc,h,hxx,hpp set shiftwidth=2 | set expandtab
 
 
 set backspace   =indent,eol,start  " Make backspace work as you would expect.
