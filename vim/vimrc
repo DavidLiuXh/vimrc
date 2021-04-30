@@ -3,18 +3,30 @@
 "
 call plug#begin('~/.vim/plugged')
 
-Plug 'junegunn/vim-easy-align'
+"Plug 'junegunn/vim-easy-align'
 Plug 'octol/vim-cpp-enhanced-highlight' "语法高亮
 Plug 'justinmk/vim-dirvish'
 Plug 'Yggdroot/LeaderF'
 Plug 'scrooloose/nerdtree'
 Plug 'derekwyatt/vim-scala'
-Plug 'Valloric/YouCompleteMe'
+"Plug 'Valloric/YouCompleteMe'
 Plug 'fatih/vim-go'
 Plug 'majutsushi/tagbar'
 Plug 'MattesGroeger/vim-bookmarks'
+Plug 'skywind3000/vim-auto-popmenu'
 
 call plug#end()
+
+
+" vim-auto-popmemu
+" 设定需要生效的文件类型，如果是 "*" 的话，代表所有类型
+let g:apc_enable_ft = {'*':1}
+" 设定从字典文件以及当前打开的文件里收集补全单词，详情看 ':help cpt'
+set cpt=.,k,w,b
+" 不要自动选中第一个选项。
+set completeopt=menu,menuone,noselect
+" 禁止在下方显示一些啰嗦的提示
+set shortmess+=c
 
 " replace \ with ,
 :let mapleader=","                                                                                                                                                           
@@ -76,10 +88,10 @@ syntax on                  " Enable syntax highlighting.
 
 set autoindent             " Indent according to previous line.
 set expandtab              " Use spaces instead of tabs.
-set softtabstop =2         " Tab key indents by 4 spaces.
+set softtabstop =2        " Tab key indents by 4 spaces
 set shiftwidth  =2         " >> indents by 4 spaces.
 set shiftround             " >> indents to next multiple of 'shiftwidth'.
-autocmd FileType c,cpp,cxx,cc,h,hxx,hpp set shiftwidth=2 | set expandtab
+autocmd FileType c,cpp,cxx,cc,h,hxx,hpp set shiftwidth=1 | set expandtab
 
 
 set backspace   =indent,eol,start  " Make backspace work as you would expect.
@@ -185,25 +197,25 @@ map <C-n> :NERDTreeToggle<CR>
 set number
 
 "set ycm
-let g:ycm_add_preview_to_completeopt = 0
-let g:ycm_show_diagnostics_ui = 0
-let g:ycm_server_log_level = 'info'
-let g:ycm_min_num_identifier_candidate_chars = 2
-let g:ycm_collect_identifiers_from_comments_and_strings = 1
-let g:ycm_complete_in_strings=1
-let g:ycm_key_invoke_completion = '<c-d>'
+"let g:ycm_add_preview_to_completeopt = 0
+"let g:ycm_show_diagnostics_ui = 0
+"let g:ycm_server_log_level = 'info'
+"let g:ycm_min_num_identifier_candidate_chars = 2
+"let g:ycm_collect_identifiers_from_comments_and_strings = 1
+"let g:ycm_complete_in_strings=1
+"let g:ycm_key_invoke_completion = '<c-d>'
 "打开vim时不再询问是否加载ycm_extra_conf.py配置  
-let g:ycm_confirm_extra_conf=1
-let g:ycm_global_ycm_extra_conf='~/.vim/plugged/YouCompleteMe/third_party/ycmd/.ycm_extra_conf.py'
+"let g:ycm_confirm_extra_conf=1
+"let g:ycm_global_ycm_extra_conf='~/.vim/plugged/YouCompleteMe/third_party/ycmd/.ycm_extra_conf.py'
 "let g:syntastic_cpp_compiler = 'g++'
-let g:syntastic_cpp_compiler_options = '-std=c++11 -stdlib=libc++'
+"let g:syntastic_cpp_compiler_options = '-std=c++11 -stdlib=libc++'
+"let g:ycm_semantic_triggers =  {
+"      \ 'c,cpp,python,java,go,erlang,perl': ['re!\w{ 2}'],
+"      \ 'cs,lua,javascript': ['re!\w{2}'],
+"      \ }
+
 
 set completeopt=menu,menuone
-
-let g:ycm_semantic_triggers =  {
-      \ 'c,cpp,python,java,go,erlang,perl': ['re!\w{ 2}'],
-      \ 'cs,lua,javascript': ['re!\w{2}'],
-      \ }
 
 
 if has("gui_running")
@@ -214,7 +226,7 @@ end
 "sudo apt-get install python-pip
 ""sudo pip install ici
 "ici plugin: \y
-nmap <Leader>y :!echo --==<C-R><C-w>==-- ;ici <C-R><C-W><CR>
+"nmap <Leader>y :!echo --==<C-R><C-w>==-- ;ici <C-R><C-W><CR>
 
 map <Leader>p :tabp<CR>                                                                                                                                                      
 map <Leader>n :tabn<CR>
