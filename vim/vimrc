@@ -16,6 +16,7 @@ Plug 'MattesGroeger/vim-bookmarks'
 Plug 'ludovicchabant/vim-gutentags'
 "Plug 'skywind3000/vim-auto-popmenu'
 "ctag 使用 https://ctags.io/
+Plug 'rhysd/vim-clang-format'
 
 call plug#end()
 
@@ -263,3 +264,7 @@ let g:gutentags_ctags_extra_args += ['--c-kinds=+px']
 if !isdirectory(s:vim_tags)
    silent! call mkdir(s:vim_tags, 'p')
 endif
+
+" 配置clang-format
+let g:clang_format#code_style = 'google'
+269 autocmd FileType c,cc,cpp,h,hpp ClangFormatAutoEnable
