@@ -267,4 +267,4 @@ endif
 
 " 配置clang-format
 let g:clang_format#code_style = 'google'
-269 autocmd FileType c,cc,cpp,h,hpp ClangFormatAutoEnable
+autocmd FileType c,cc,cpp,h,hpp ClangFormatAutoEnable
