@@ -268,3 +268,7 @@ endif
 " 配置clang-format
 let g:clang_format#code_style = 'google'
 autocmd FileType c,cc,cpp,h,hpp ClangFormatAutoEnable
+
+" 配置autopep8
+" pip3 install autopep8
+au BufWritePost *.py execute ':silent !autopep8 --in-place %'
